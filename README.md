@@ -1,8 +1,9 @@
 # IUNIS-eats
 
 ## Integrantes
- - heidi
+ - Heidi
  - Neri
  - Yanet
  - Abner
  - Yamili
+ - Juan C

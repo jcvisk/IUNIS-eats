@@ -3,7 +3,7 @@
 ## Integrantes
  - Heidi
  - Neri
- - Yanet
+ - Yanet Tiempo
  - Abner
  - Yamili
  - Juan C

@@ -1,4 +1,4 @@
-package mx.edu.iunis.eats.home;
+package mx.edu.iunis.eats.controller.home;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

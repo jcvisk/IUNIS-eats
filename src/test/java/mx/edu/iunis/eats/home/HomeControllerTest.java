@@ -1,5 +1,6 @@
 package mx.edu.iunis.eats.home;
 
+import mx.edu.iunis.eats.controller.home.HomeController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;

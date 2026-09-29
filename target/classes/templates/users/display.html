@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${appName}">IUNIS Eats</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="hero">
+    <p class="eyebrow">Usuarios</p>
+    <h1>IUNIS Eats</h1>
+    <p class="description">
+        Administra tus usuarios
+    </p>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">user</th>
+            <th scope="col">role</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th scope="row">Chris</th>
+            <td>HTML tables</td>
+            <td>22</td>
+        </tr>
+    </table>
+
+</main>
+</body>
+</html>

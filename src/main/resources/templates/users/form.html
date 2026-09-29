@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${editing} ? 'Editar usuario | ' + appName : 'Crear usuario | ' + appName">Usuario | IUNIS Eats</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="form-card">
+    <p class="eyebrow">Administración</p>
+    <h1 th:text="${editing} ? 'Editar usuario' : 'Crear usuario'">Usuario</h1>
+    <p class="description" th:if="${editing}">Actualiza los datos de la cuenta. Deja la contraseña vacía para conservarla.</p>
+    <p class="description" th:unless="${editing}">Registra una nueva cuenta para IUNIS Eats.</p>
+
+    <p class="alert" th:if="${formError}" th:text="${formError}" role="alert"></p>
+
+    <form class="user-form" th:object="${user}"
+          th:action="${editing} ? @{/users/{id}(id=${user.id})} : @{/users}" method="post">
+        <label for="userName">Nombre de usuario</label>
+        <input id="userName" type="text" th:field="*{userName}" maxlength="255" autocomplete="username" required>
+
+        <label for="password">Contraseña <span th:if="${editing}">(opcional)</span></label>
+        <input id="password" type="password" th:field="*{password}" maxlength="255"
+               autocomplete="new-password" th:required="${!editing}"
+               th:placeholder="${editing} ? 'Deja vacío para conservar la actual' : 'Contraseña'">
+
+        <label for="role">Rol</label>
+        <input id="role" type="number" th:field="*{role}" min="0" required>
+
+        <div class="form-actions">
+            <a class="button button-secondary" th:href="@{/users}">Cancelar</a>
+            <button class="button button-primary" type="submit" th:text="${editing} ? 'Guardar cambios' : 'Crear usuario'">Guardar</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

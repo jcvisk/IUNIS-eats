@@ -3,32 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${appName}">IUNIS Eats</title>
+    <title th:text="'Usuarios | ' + appName">Usuarios | IUNIS Eats</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-<main class="hero">
-    <p class="eyebrow">Usuarios</p>
-    <h1>IUNIS Eats</h1>
-    <p class="description">
-        Administra tus usuarios
-    </p>
-    <table>
-        <thead>
-        <tr>
-            <th scope="col">id</th>
-            <th scope="col">user</th>
-            <th scope="col">role</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row">Chris</th>
-            <td>HTML tables</td>
-            <td>22</td>
-        </tr>
-    </table>
+<main class="page-card">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow">Administración</p>
+            <h1>Usuarios</h1>
+            <p class="description">Consulta y administra las cuentas de IUNIS Eats.</p>
+        </div>
+        <a class="button button-primary" th:href="@{/users/new}">Crear usuario</a>
+    </header>
 
+    <p class="notice" th:if="${notice}" th:text="${notice}" role="status"></p>
+    <p class="alert" th:if="${error}" th:text="${error}" role="alert"></p>
+
+    <div class="table-wrap" th:if="${!users.isEmpty()}">
+        <table>
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre de usuario</th>
+                <th scope="col">Rol</th>
+                <th scope="col">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}">1</td>
+                <td th:text="${user.userName}">usuario</td>
+                <td th:text="${user.role}">1</td>
+                <td class="actions">
+                    <a class="button button-secondary" th:href="@{/users/{id}/edit(id=${user.id})}">Editar</a>
+                    <form th:action="@{/users/{id}/delete(id=${user.id})}" method="post"
+                          onsubmit="return confirm('¿Eliminar este usuario?');">
+                        <button class="button button-danger" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="empty-state" th:if="${users.isEmpty()}">
+        <h2>Aún no hay usuarios</h2>
+        <p>Crea el primer usuario para comenzar.</p>
+        <a class="button button-primary" th:href="@{/users/new}">Crear usuario</a>
+    </div>
 </main>
 </body>
 </html>

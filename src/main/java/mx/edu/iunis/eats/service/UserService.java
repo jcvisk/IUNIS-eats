@@ -3,10 +3,12 @@ package mx.edu.iunis.eats.service;
 import mx.edu.iunis.eats.domain.User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     User createUser(User user);
-    List<User> listUser();
-    void deleteUser(User user);
-    User updateUser(User user);
+    List<User> listUsers();
+    Optional<User> findUserById(Long id);
+    User updateUser(Long id, User user);
+    void deleteUser(Long id);
 }

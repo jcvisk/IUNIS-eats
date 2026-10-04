@@ -9,6 +9,7 @@ public interface UserService {
     User createUser(User user);
     List<User> listUsers();
     Optional<User> findUserById(Long id);
+    boolean userNameExists(String userName);
     User updateUser(Long id, User user);
     void deleteUser(Long id);
 }

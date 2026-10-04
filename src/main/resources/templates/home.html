@@ -14,6 +14,11 @@
         Consulta el menú y realiza tus pedidos antes del receso.
     </p>
     <p class="status">La aplicación inicial con Thymeleaf funciona correctamente.</p>
+    <form th:action="@{/logout}" method="post" class="form-actions">
+        <button class="button button-secondary" type="submit">
+            Cerrar sesión
+        </button>
+    </form>
 </main>
 </body>
 </html>

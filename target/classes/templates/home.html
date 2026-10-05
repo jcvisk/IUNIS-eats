@@ -1,19 +1,162 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title th:text="${appName}">IUNIS Eats</title>
+
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
+
 <body>
-<main class="hero">
-    <p class="eyebrow">Cafetería universitaria</p>
-    <h1 th:text="${appName}">IUNIS Eats</h1>
-    <p class="description">
-        Consulta el menú y realiza tus pedidos antes del receso.
-    </p>
-    <p class="status">La aplicación inicial con Thymeleaf funciona correctamente.</p>
+// linea 15 crea un enlace a /
+<header class="main-header">
+
+    <a class="brand" href="/">
+        <span class="brand-mark">IE</span>
+        <span th:text="${appName}">IUNIS Eats</span>
+    </a>
+
+    <a class="button button-secondary" href="#como-funciona">
+        ¿Cómo funciona?
+    </a>
+
+</header>
+
+
+<main>
+
+    <section class="home-hero">
+
+        <div class="hero-content">
+
+            <p class="eyebrow">
+                Cafetería universitaria
+            </p>
+
+            <h1>
+                Tu comida,
+                <span>lista para el receso.</span>
+            </h1>
+
+            <p class="description">
+                Consulta el menú con anticipación, realiza tu pedido
+                y recógelo en la cafetería durante el receso.
+            </p>
+
+            <div class="hero-actions">
+
+                <a class="button button-primary" th:href="@{/menu}">
+                    Ver Menú
+                </a>
+
+                <a class="button button-secondary" href="#como-funciona">
+                    Conocer el servicio
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="how-section" id="como-funciona">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                IUNIS Eats
+            </p>
+
+            <h2>
+                Así funciona
+            </h2>
+
+            <p>
+                El proceso está pensado para que puedas realizar tu pedido
+                antes de llegar a la cafetería.
+            </p>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <article class="feature-card">
+
+                <div class="feature-number">
+                    01
+                </div>
+
+                <h3>
+                    Consulta
+                </h3>
+
+                <p>
+                    Revisa anticipadamente los platillos y precios
+                    disponibles.
+                </p>
+
+            </article>
+
+
+            <article class="feature-card">
+
+                <div class="feature-number">
+                    02
+                </div>
+
+                <h3>
+                    Pide
+                </h3>
+
+                <p>
+                    Realiza tu pedido antes del límite establecido
+                    para el periodo de servicio.
+                </p>
+
+            </article>
+
+
+            <article class="feature-card">
+
+                <div class="feature-number">
+                    03
+                </div>
+
+                <h3>
+                    Recoge
+                </h3>
+
+                <p>
+                    Durante el receso, recoge tu pedido preparado
+                    y realiza el pago en la cafetería.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <form th:action="@{/logout}" method="post" class="form-actions">
+        <button class="button button-secondary" type="submit">
+            Cerrar sesión
+        </button>
+    </form>
 </main>
+
+
+<footer class="main-footer">
+
+    <p>
+        IUNIS Eats · Cafetería universitaria
+    </p>
+
+</footer>
+
 </body>
 </html>

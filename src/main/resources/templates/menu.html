@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${appName} + ' - Menú'">Menú - IUNIS Eats</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+
+<header class="main-header">
+    <a class="brand" href="/">
+        <span class="brand-mark">IE</span>
+        <span th:text="${appName}">IUNIS Eats</span>
+    </a>
+    <a class="button button-secondary" href="/">Volver al inicio</a>
+</header>
+
+<main>
+    <section class="how-section">
+        <div class="section-heading">
+            <p class="eyebrow">Cafetería universitaria</p>
+            <h2>Menú del día</h2>
+            <p>Consulta los platillos disponibles antes del receso.</p>
+        </div>
+
+        <div class="feature-grid">
+            <!-- Thymeleaf recorre la lista de platillos y crea una tarjeta por cada uno -->
+            <article class="feature-card" th:each="platillo : ${platillos}">
+                <h3 th:text="${platillo.nombre}">Nombre del platillo</h3>
+                <p th:text="'$' + ${platillo.precio}">Precio</p>
+
+                <p th:if="${platillo.disponible}"
+                   style="color: green; font-weight: bold;">
+                    Disponible
+                </p>
+                <p th:unless="${platillo.disponible}"
+                   style="color: red; font-weight: bold;">
+                    Agotado
+                </p>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer class="main-footer">
+    <p>IUNIS Eats · Cafetería universitaria</p>
+</footer>
+
+</body>
+</html>

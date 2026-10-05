@@ -6,7 +6,7 @@ spring:
     cache: false
 
   datasource:
-    url: jdbc:postgresql://localhost:54325/iuniseatsdb
+    url: jdbc:postgresql://localhost:5432/iuniseatsdb
     username: admin
     password: admin123
     driver-class-name: org.postgresql.Driver

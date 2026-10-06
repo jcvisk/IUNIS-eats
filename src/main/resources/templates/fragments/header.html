@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header class="main-header" th:fragment="header">
+
+    <a class="brand" th:href="@{/}">
+        <span class="brand-mark">IE</span>
+        <span>IUNIS Eats</span>
+    </a>
+
+    <form th:action="@{/logout}" method="post">
+        <button class="button button-secondary" type="submit">
+            Cerrar sesión
+        </button>
+    </form>
+
+</header>
+
+</body>
+</html>

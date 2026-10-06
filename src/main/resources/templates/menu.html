@@ -8,13 +8,7 @@
 </head>
 <body>
 
-<header class="main-header">
-    <a class="brand" href="/">
-        <span class="brand-mark">IE</span>
-        <span th:text="${appName}">IUNIS Eats</span>
-    </a>
-    <a class="button button-secondary" href="/">Volver al inicio</a>
-</header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <main>
     <section class="how-section">

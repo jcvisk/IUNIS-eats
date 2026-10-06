@@ -12,18 +12,7 @@
 
 <body>
 // linea 15 crea un enlace a /
-<header class="main-header">
-
-    <a class="brand" href="/">
-        <span class="brand-mark">IE</span>
-        <span th:text="${appName}">IUNIS Eats</span>
-    </a>
-
-    <a class="button button-secondary" href="#como-funciona">
-        ¿Cómo funciona?
-    </a>
-
-</header>
+<header th:replace="~{fragments/header :: header}"></header>
 
 
 <main>
@@ -141,12 +130,6 @@
         </div>
 
     </section>
-
-    <form th:action="@{/logout}" method="post" class="form-actions">
-        <button class="button button-secondary" type="submit">
-            Cerrar sesión
-        </button>
-    </form>
 </main>
 
 

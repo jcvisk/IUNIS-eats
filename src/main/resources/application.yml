@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/iuniseatsdb
-    username: admin
-    password: admin123
+    username: postgres
+    password: Sasa
     driver-class-name: org.postgresql.Driver
 
   jpa:

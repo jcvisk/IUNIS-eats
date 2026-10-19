@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+    <h1 class="page-title-admin">Panel de cafetería</h1>
+
+    <div class="grid-metricas">
+        <div class="metrica atencion">
+            <div class="metrica-label">ATENCIÓN REQUERIDA</div>
+            <div class="metrica-value" th:text="${pedidosPendientes != null ? pedidosPendientes : 0}">0</div>
+            <div class="metrica-desc">Pedidos pendientes</div>
+        </div>
+        <div class="metrica">
+            <div class="metrica-label">EN COCINA</div>
+            <div class="metrica-value" th:text="${enCocina != null ? enCocina : 0}">0</div>
+            <div class="metrica-desc">En preparación</div>
+        </div>
+        <div class="metrica">
+            <div class="metrica-label">LISTOS PARA ENTREGA</div>
+            <div class="metrica-value" th:text="${listos != null ? listos : 0}">0</div>
+            <div class="metrica-desc">Por entregar</div>
+        </div>
+        <div class="metrica">
+            <div class="metrica-label">CATÁLOGO</div>
+            <div class="metrica-value" th:text="${platillosActivos != null ? platillosActivos : 0}">0</div>
+            <div class="metrica-desc">Platillos activos hoy</div>
+        </div>
+    </div>
+
+    <section class="admin-bloque">
+        <h2 class="bloque-title">Accesos rápidos</h2>
+        <div class="accesos-rapidos">
+            <a th:href="@{/admin/menu}" class="btn-ambar">Publicar menú del día</a>
+            <a th:href="@{/admin/pedidos}" class="btn-verde">Ver pedidos pendientes</a>
+            <a th:href="@{/admin/platillos}" class="btn-outline">Gestionar platillos</a>
+            <a th:href="@{/admin/reportes}" class="btn-outline">Consultar reportes</a>
+        </div>
+    </section>
+</th:block>
+
+</body>
+</html>

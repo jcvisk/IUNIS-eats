@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' · IUNIS Eats'">Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="layout-admin">
+
+<div class="admin-layout">
+
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <img th:src="@{/images/logo-iunis-eats.png}"
+                 alt="IUNIS Eats"
+                 class="brand-logo-sidebar">
+            <div class="sidebar-title">Panel administrativo</div>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-name" th:text="${usuarioNombre != null ? usuarioNombre : 'Personal'}">Personal</div>
+            <div class="user-role">Personal de cafetería</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/admin}" class="nav-item"
+               th:classappend="${pantallaActual == 'panel'} ? 'active' : ''">
+                Panel
+            </a>
+            <a th:href="@{/admin/pedidos}" class="nav-item"
+               th:classappend="${pantallaActual == 'pedidos'} ? 'active' : ''">
+                Pedidos
+                <span class="nav-badge"
+                      th:if="${pedidosPendientes != null and pedidosPendientes > 0}"
+                      th:text="${pedidosPendientes}">0</span>
+            </a>
+            <a th:href="@{/admin/platillos}" class="nav-item"
+               th:classappend="${pantallaActual == 'platillos'} ? 'active' : ''">
+                Platillos
+            </a>
+            <a th:href="@{/admin/menu}" class="nav-item"
+               th:classappend="${pantallaActual == 'menu'} ? 'active' : ''">
+                Menú del día
+            </a>
+            <a th:href="@{/admin/reportes}" class="nav-item"
+               th:classappend="${pantallaActual == 'reportes'} ? 'active' : ''">
+                Reportes
+            </a>
+        </nav>
+
+        <form th:action="@{/logout}" method="post" class="sidebar-logout">
+            <button type="submit" class="btn-outline-light">Cerrar sesión</button>
+        </form>
+    </aside>
+
+    <div class="admin-main">
+
+        <header class="admin-topbar">
+            <div class="breadcrumb" th:text="${breadcrumb != null ? breadcrumb : 'Panel'}">Panel</div>
+            <div class="topbar-status">
+                <span class="status-dot"></span>
+                <span class="status-item" th:text="${estadoTurno != null ? estadoTurno : 'Turno Activo'}">Turno Activo</span>
+            </div>
+        </header>
+
+        <section class="admin-content">
+            <div th:replace="${content}"></div>
+        </section>
+
+    </div>
+</div>
+
+</body>
+</html>

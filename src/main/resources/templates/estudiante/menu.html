@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${appName} + ' - Menú'">Menú - IUNIS Eats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="layout-estudiante">
+
+<header class="navbar-estudiante">
+    <a th:href="@{/}" class="navbar-brand">
+        <img th:src="@{/images/logo-iunis-eats.png}"
+             alt="IUNIS Eats"
+             class="brand-logo">
+    </a>
+    <div class="navbar-actions">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn-outline-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+</header>
+
+<div class="periodo-banner">
+    Periodo abierto hasta las 13:00 hrs
+</div>
+
+<main class="contenido-estudiante">
+
+    <div class="page-header">
+        <p class="eyebrow">Periodo del día</p>
+        <h1 class="page-title">Menú del día</h1>
+        <p class="page-subtitle">Consulta los platillos disponibles antes del receso.</p>
+    </div>
+
+    <div class="tabs-categoria">
+        <button class="tab active" data-categoria="todos">Todos</button>
+        <button class="tab" data-categoria="comida">Comidas</button>
+        <button class="tab" data-categoria="bebida">Bebidas</button>
+        <button class="tab" data-categoria="snack">Snacks</button>
+    </div>
+
+    <div class="grid-platillos">
+        <article class="card-platillo" th:each="p : ${platillos}">
+
+            <div class="card-image">
+                <img th:if="${p.imagen != null and !p.imagen.isEmpty()}"
+                     th:src="${p.imagen}"
+                     th:alt="${p.nombre}">
+                <div th:unless="${p.imagen != null and !p.imagen.isEmpty()}"
+                     class="image-placeholder"></div>
+            </div>
+
+            <div class="card-body">
+                <h3 th:text="${p.nombre}">Nombre del platillo</h3>
+                <p th:text="${p.descripcion}">Descripción del platillo</p>
+
+                <div class="card-footer">
+                    <span class="price"
+                          th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2)}">$0.00</span>
+                    <span class="badge"
+                          th:classappend="${p.disponibilidad} ? 'badge-success' : 'badge-danger'"
+                          th:text="${p.disponibilidad} ? 'Disponible' : 'Agotado'">
+                        Disponible
+                    </span>
+                </div>
+
+                <button class="btn-primary btn-full"
+                        type="button"
+                        th:disabled="${!p.disponibilidad}"
+                        th:text="${p.disponibilidad} ? 'Agregar al pedido' : 'No disponible'">
+                    Agregar al pedido
+                </button>
+            </div>
+
+        </article>
+
+        <div th:if="${platillos == null or platillos.isEmpty()}"
+             style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--texto-sec);">
+            Aún no hay platillos publicados.
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <!-- Encabezado de la página -->
+    <div class="page-header-admin">
+        <h1 class="page-title-admin">Catálogo de platillos</h1>
+        <a th:href="@{/admin/platillos/nuevo}" class="btn-ambar">Nuevo Platillo</a>
+    </div>
+
+    <!-- Barra de filtros (visuales por ahora) -->
+    <div class="filtros-bar">
+        <input type="text" class="input-busqueda" placeholder="Buscar por nombre...">
+        <select class="select-filtro">
+            <option>Todas las Categorías</option>
+            <option>Comidas</option>
+            <option>Bebidas</option>
+            <option>Snacks</option>
+        </select>
+        <select class="select-filtro">
+            <option>Todos los Estados</option>
+            <option>Disponible</option>
+            <option>Agotado</option>
+        </select>
+    </div>
+
+    <!-- Tabla de platillos -->
+    <div class="tabla-container">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th>IMG</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Disponibilidad</th>
+                <th>Actualización</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Iteramos sobre la lista de platillos que envía el controlador -->
+            <tr th:each="p : ${platillos}">
+                <!-- Miniatura de imagen -->
+                <td class="celda-img">
+                    <div class="img-thumb"
+                         th:style="${p.imagen != null and !p.imagen.isEmpty()} ? 'background-image: url(' + ${p.imagen} + ')' : ''">
+                    </div>
+                </td>
+
+                <td th:text="${p.nombre}">Nombre</td>
+                <td th:text="${p.categoria}">Categoría</td>
+                <td class="celda-precio" th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2)}">$0.00</td>
+
+                <!-- Switch para cambiar disponibilidad -->
+                <td>
+                    <form th:action="@{/admin/platillos/toggle/{id}(id=${p.id})}" method="post" class="toggle-form">
+                        <!-- Enviamos el valor contrario al actual para que haga el "toggle" -->
+                        <input type="hidden" name="disponible" th:value="${!p.disponibilidad}">
+                        <button type="submit" class="toggle-switch"
+                                th:classappend="${p.disponibilidad} ? 'on' : 'off'">
+                            <span class="toggle-knob"></span>
+                        </button>
+                        <span class="toggle-label"
+                              th:classappend="${p.disponibilidad} ? 'label-on' : 'label-off'"
+                              th:text="${p.disponibilidad} ? 'Disponible' : 'Agotado'">Disponible</span>
+                    </form>
+                </td>
+
+                <!-- Fecha de actualización -->
+                <td class="celda-fecha">
+                        <span th:if="${p.fechaActualizacion != null}">
+                            <span th:text="${#temporals.format(p.fechaActualizacion, 'dd/MM HH:mm')}">08/10 08:30</span>
+                        </span>
+                </td>
+
+                <!-- Acciones -->
+                <td class="celda-acciones">
+                    <a th:href="@{/admin/platillos/editar/{id}(id=${p.id})}" class="link-accion">Editar</a>
+                    <a th:href="@{/admin/platillos/eliminar/{id}(id=${p.id})}"
+                       class="link-accion link-danger"
+                       onclick="return confirm('¿Eliminar este platillo?')">Eliminar</a>
+                </td>
+            </tr>
+
+            <!-- Mensaje si la tabla está vacía -->
+            <tr th:if="${platillos == null or platillos.isEmpty()}">
+                <td colspan="7" class="tabla-vacia">No hay platillos registrados aún. Crea el primero.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</th:block>
+
+</body>
+</html>

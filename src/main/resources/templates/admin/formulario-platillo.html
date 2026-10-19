@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <h1 class="page-title-admin"
+        th:text="${platillo.id != null ? 'Editar platillo' : 'Nuevo platillo'}">
+        Nuevo platillo
+    </h1>
+
+    <form th:action="@{/admin/platillos/guardar}" th:object="${platillo}" method="post" class="formulario-platillo">
+
+        <!-- Campo oculto para el ID (importante para editar) -->
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-grid">
+            <!-- Columna izquierda -->
+            <div class="form-col-izq">
+                <div class="campo">
+                    <label>Nombre del platillo</label>
+                    <input type="text" th:field="*{nombre}" required>
+                </div>
+
+                <div class="campo">
+                    <label>Descripción corta</label>
+                    <textarea th:field="*{descripcion}" rows="5"></textarea>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="campo">
+                        <label>Categoría</label>
+                        <select th:field="*{categoria}">
+                            <option value="Comida">Comidas</option>
+                            <option value="Bebida">Bebidas</option>
+                            <option value="Snack">Snacks</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label>Precio ($ MXN)</label>
+                        <input type="number" step="0.01" min="0" th:field="*{precio}" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="form-col-der">
+                <div class="campo">
+                    <label>URL de imagen (opcional)</label>
+                    <input type="text" th:field="*{imagen}" placeholder="Ej. /images/platillos/torta.jpg">
+                </div>
+
+                <div class="preview-imagen">
+                    <img th:if="${platillo.imagen != null and !platillo.imagen.isEmpty()}"
+                         th:src="${platillo.imagen}" alt="Preview">
+                    <div th:unless="${platillo.imagen != null and !platillo.imagen.isEmpty()}"
+                         class="preview-vacia"></div>
+                </div>
+
+                <div class="campo-toggle">
+                    <label class="switch-label">
+                        <input type="checkbox" th:field="*{disponibilidad}" class="switch-input">
+                        <span class="switch-track"><span class="switch-knob"></span></span>
+                        <span>Visible en el catálogo</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions-bar">
+            <button type="submit" class="btn-verde">Guardar platillo</button>
+            <a th:href="@{/admin/platillos}" class="btn-cancelar">Cancelar</a>
+        </div>
+
+    </form>
+
+</th:block>
+
+</body>
+</html>

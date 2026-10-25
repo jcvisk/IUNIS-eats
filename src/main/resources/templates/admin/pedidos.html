@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <div class="page-header-admin" style="margin-bottom: 16px;">
+        <h1 class="page-title-admin" style="margin: 0;">Recepción de pedidos</h1>
+        <div class="topbar-status" style="background: var(--verde-claro);">
+            <span class="status-dot"></span>
+            <span class="status-item">Operando</span>
+        </div>
+    </div>
+
+    <!-- Layout de dos columnas -->
+    <div class="pedidos-layout">
+
+        <!-- COLUMNA IZQUIERDA: Lista de Pedidos -->
+        <div class="lista-pedidos">
+            <!-- Tabs de estado (visual) -->
+            <div class="tabs-pedidos">
+                <button class="tab-pedido active">Pendientes (<span th:text="${pedidos.size()}">0</span>)</button>
+                <button class="tab-pedido">En Cocina (0)</button>
+                <button class="tab-pedido">Listos (0)</button>
+            </div>
+
+            <!-- Iteración de pedidos -->
+            <div th:each="pedido : ${pedidos}"
+                 class="card-pedido"
+                 th:classappend="${pedidoSeleccionado != null and pedido.id == pedidoSeleccionado.id} ? 'seleccionado' : ''">
+
+                <div class="card-pedido-header">
+                    <strong th:text="'#' + ${pedido.id}">#43</strong>
+                    <span th:text="${#temporals.format(pedido.fechaHora, 'HH:mm')} + ' (Hace X min)'">13:05</span>
+                </div>
+                <div class="card-pedido-body">
+                    <span>Estudiante: <span th:text="${pedido.idUsuario}">20230145</span></span>
+                    <strong th:text="'$' + ${pedido.total}">$95.00</strong>
+                </div>
+                <div class="card-pedido-footer">
+                    <span class="badge badge-success" th:text="${pedido.estado}">PENDIENTE</span>
+                    <a href="#" class="btn-outline-sm" style="font-size: 0.75rem; padding: 4px 8px;">Ver detalle</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: Detalle del Pedido (Comanda) -->
+        <div class="detalle-pedido" th:if="${pedidoSeleccionado != null}">
+
+            <div class="detalle-header">
+                <h2 th:text="'#' + ${pedidoSeleccionado.id}">#43</h2>
+                <span class="badge badge-success" th:text="${pedidoSeleccionado.estado}">PENDIENTE</span>
+            </div>
+
+            <p style="color: var(--texto-sec); font-size: 0.875rem; margin-bottom: 20px;">
+                Estudiante: <span th:text="${pedidoSeleccionado.idUsuario}">20230145</span> ·
+                Registrado a las <span th:text="${#temporals.format(pedidoSeleccionado.fechaHora, 'HH:mm')}">13:05</span>
+            </p>
+
+            <!-- La Comanda (Estilo ticket) -->
+            <div class="comanda">
+                <h3 class="comanda-title">COMANDA CAFETERÍA IUNIS</h3>
+
+                <!-- Aquí luego iteraremos sobre los DetallePedido reales -->
+                <div class="comanda-item">
+                    <span>2x Torta de Jamón</span>
+                    <strong>$70.00</strong>
+                </div>
+                <div class="comanda-item">
+                    <span>1x Quesadilla</span>
+                    <strong>$25.00</strong>
+                </div>
+
+                <div class="comanda-total">
+                    <span>TOTAL</span>
+                    <strong th:text="'$' + ${pedidoSeleccionado.total}">$95.00</strong>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="detalle-acciones">
+                <button class="btn-verde" style="flex: 1; padding: 12px;">Aceptar pedido</button>
+                <button class="btn-cancelar" style="flex: 1; padding: 12px;">Rechazar</button>
+            </div>
+        </div>
+
+        <!-- Estado vacío si no hay pedido seleccionado -->
+        <div class="detalle-pedido empty-state" th:if="${pedidoSeleccionado == null}">
+            <p>Selecciona un pedido de la lista para ver los detalles.</p>
+        </div>
+
+    </div>
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <div class="page-header-admin">
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <h1 class="page-title-admin" style="margin-bottom: 0;">Reportes de demanda</h1>
+            <p style="color: var(--texto-sec); font-size: 0.875rem; margin: 0;">Análisis histórico de platillos solicitados.</p>
+        </div>
+        <!-- Botón de exportar (visual por ahora) -->
+        <button class="btn-outline" style="display: flex; align-items: center; gap: 8px;">
+            Exportar CSV
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-reportes" style="border: 1px solid var(--borde); background-color: #FAFAFA;">
+        <div class="campo-inline">
+            <label>Fecha inicio</label>
+            <input type="date">
+        </div>
+        <div class="campo-inline">
+            <label>Fecha fin</label>
+            <input type="date">
+        </div>
+        <button class="btn-verde" style="margin-left: 12px;">Aplicar filtro</button>
+    </div>
+
+    <!-- Gráfico de barras -->
+    <section class="bloque-reporte" style="border: 1px solid var(--borde);">
+        <h2 class="bloque-reporte-title">Top 5 platillos más solicitados (Unidades)</h2>
+
+        <div class="grafico-barras">
+            <div class="barra-item" th:each="item : ${topPlatillos}">
+                <div class="barra-valor" th:text="${item.unidades}">80</div>
+                <!-- La altura de la barra se calcula dinámicamente con el porcentaje -->
+                <div class="barra" th:style="'height: ' + ${item.porcentaje} + '%'"
+                     th:classappend="${item.destacado} ? 'barra-destacada' : ''"></div>
+                <div class="barra-label" th:text="${item.nombre}">Nombre</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabla de ranking -->
+    <div class="tabla-container" style="margin-top: 24px;">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>Platillo</th>
+                <th>Categoría</th>
+                <th>Unidades Vendidas</th>
+                <th>% del total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p, iter : ${topPlatillos}">
+                <td style="text-align: center; font-weight: 600; color: var(--texto-sec);" th:text="${iter.index + 1}">1</td>
+                <td style="font-weight: 500;" th:text="${p.nombre}">Nombre</td>
+                <td style="color: var(--texto-sec);" th:text="${p.categoria}">Categoría</td>
+                <td style="font-weight: 600;" th:text="${p.unidades}">80</td>
+                <td>
+                    <div class="progress-bar">
+                        <!-- Barra de progreso verde o ámbar si es el destacado -->
+                        <div class="progress-fill"
+                             th:style="'width: ' + ${p.porcentaje} + '%'"
+                             th:classappend="${p.destacado} ? 'progress-ambar' : ''"></div>
+                        <span class="progress-text" th:text="${p.porcentaje} + '%'">100%</span>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</th:block>
+
+</body>
+</html>

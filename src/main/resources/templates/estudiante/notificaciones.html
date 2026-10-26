@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-estudiante :: layout(~{::content})}">
+<body>
+<th:block th:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">Notificaciones</h1>
+    </div>
+
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div th:each="n : ${notificaciones}" class="card-platillo" style="padding: 16px; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between;">
+                <strong th:text="${n.mensaje}">Mensaje de la notificación</strong>
+                <span style="color: var(--texto-sec); font-size: 0.8rem;"
+                      th:text="${#temporals.format(n.fechaHora, 'dd/MM HH:mm')}">Fecha</span>
+            </div>
+        </div>
+
+        <div th:if="${notificaciones.isEmpty()}" style="text-align: center; color: var(--texto-sec);">
+            No tienes notificaciones nuevas.
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

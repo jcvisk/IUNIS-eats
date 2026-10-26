@@ -13,21 +13,30 @@
     <div style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto;">
 
         <div th:each="p : ${pedidos}" class="card-platillo" style="padding: 20px;">
+            <!-- Encabezado del pedido -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
                     <strong style="font-size: 1.125rem;" th:text="'#' + ${p.id}">#43</strong>
                     <span style="color: var(--texto-sec); font-size: 0.875rem; margin-left: 12px;"
                           th:text="${#temporals.format(p.fechaHora, 'dd/MM/yyyy HH:mm')}">Fecha</span>
                 </div>
-                <!-- Etiqueta de estado -->
                 <span class="badge"
                       th:classappend="${p.estado == 'PENDIENTE' ? 'badge-danger' : 'badge-success'}"
                       th:text="${p.estado}">ESTADO</span>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--borde); padding-top: 12px;">
+            <!-- Detalle de los platillos -->
+            <div style="border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); padding: 12px 0; margin-bottom: 12px;">
+                <div th:each="item : ${detallesPorPedido[p.id]}" style="display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: 6px;">
+                    <span style="color: var(--texto-sec);" th:text="${item.cantidad} + 'x ' + ${item.nombre}">1x Platillo</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</span>
+                </div>
+            </div>
+
+            <!-- Total -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="color: var(--texto-sec);">Total del pedido</span>
-                <strong style="color: var(--ambar); font-size: 1.25rem;" th:text="'$' + ${p.total}">$0.00</strong>
+                <strong style="color: var(--ambar); font-size: 1.25rem;" th:text="'$' + ${#numbers.formatDecimal(p.total, 1, 2)}">$0.00</strong>
             </div>
         </div>
 

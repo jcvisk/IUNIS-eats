@@ -1,9 +1,11 @@
 package mx.edu.iunis.eats.controller;
 
 import mx.edu.iunis.eats.domain.DetallePedido;
+import mx.edu.iunis.eats.domain.Notificacion;
 import mx.edu.iunis.eats.domain.Pedido;
 import mx.edu.iunis.eats.domain.Platillo;
 import mx.edu.iunis.eats.repository.DetallePedidoRepository;
+import mx.edu.iunis.eats.repository.NotificacionRepository;
 import mx.edu.iunis.eats.repository.PedidoRepository;
 import mx.edu.iunis.eats.service.PlatilloService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +33,9 @@ public class AdminPedidoController {
     @Autowired
     private PlatilloService platilloService;
 
+    @Autowired
+    private NotificacionRepository notificacionRepository;
+
     @GetMapping
     public String listarPedidos(@RequestParam(name = "idPedido", required = false) Long idPedido, Model model) {
         model.addAttribute("pageTitle", "Pedidos");
@@ -39,16 +45,14 @@ public class AdminPedidoController {
         List<Pedido> pedidos = pedidoRepository.findAllByOrderByFechaHoraDesc();
         model.addAttribute("pedidos", pedidos);
 
-        // Si se envió un ID, buscamos ese pedido. Si no, cargamos el más reciente.
         Pedido seleccionado = null;
         if (idPedido != null) {
             seleccionado = pedidoRepository.findById(idPedido).orElse(null);
         } else if (!pedidos.isEmpty()) {
-            seleccionado = pedidos.get(0); // El más reciente
+            seleccionado = pedidos.get(0);
         }
         model.addAttribute("pedidoSeleccionado", seleccionado);
 
-        // Si hay un pedido seleccionado, buscamos sus detalles reales
         if (seleccionado != null) {
             List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido(seleccionado.getId());
             List<Map<String, Object>> detallesView = new ArrayList<>();
@@ -70,12 +74,25 @@ public class AdminPedidoController {
         return "admin/pedidos";
     }
 
+    // ÚNICO método cambiarEstado (Ahora incluye la notificación)
     @PostMapping("/cambiar-estado/{id}")
     public String cambiarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
         pedidoRepository.findById(id).ifPresent(pedido -> {
             pedido.setEstado(nuevoEstado);
             pedidoRepository.save(pedido);
+
+            // --- CREAMOS LA NOTIFICACIÓN PARA EL ESTUDIANTE ---
+            Notificacion noti = new Notificacion();
+            noti.setIdUsuario(pedido.getIdUsuario());
+            noti.setIdPedido(pedido.getId());
+            noti.setTipo("ESTADO");
+            noti.setMensaje("Tu pedido #" + pedido.getId() + " ha cambiado al estado: " + nuevoEstado);
+            noti.setFechaHora(LocalDateTime.now());
+            noti.setLeida(false);
+
+            notificacionRepository.save(noti);
+            // --------------------------------------------------
         });
-        return "redirect:/admin/pedidos?idPedido=" + id; // Mantiene el pedido seleccionado
+        return "redirect:/admin/pedidos?idPedido=" + id;
     }
 }

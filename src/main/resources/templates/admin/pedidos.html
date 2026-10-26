@@ -82,31 +82,45 @@
                 </div>
             </div>
 
-            <!-- Acciones -->
-            <div class="detalle-acciones">
-                <!-- Formulario para Aceptar -->
-                <form th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+            <!-- Acciones Dinámicas según el Estado -->
+            <div class="detalle-acciones" style="display: flex; gap: 12px; margin-top: 24px;">
+
+                <!-- 1. Si está PENDIENTE: Aceptar o Rechazar -->
+                <form th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}" th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
                     <input type="hidden" name="nuevoEstado" value="ACEPTADO">
-                    <button type="submit" class="btn-verde" style="width: 100%; padding: 12px;" th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}">
-                        Aceptar pedido
-                    </button>
+                    <button type="submit" class="btn-verde" style="width: 100%; padding: 12px;">Aceptar pedido</button>
                 </form>
-
-                <!-- Formulario para Rechazar -->
-                <form th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                <form th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}" th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
                     <input type="hidden" name="nuevoEstado" value="RECHAZADO">
-                    <button type="submit" class="btn-cancelar" style="width: 100%; padding: 12px;" th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}">
-                        Rechazar
-                    </button>
+                    <button type="submit" class="btn-cancelar" style="width: 100%; padding: 12px;">Rechazar</button>
                 </form>
 
-                <!-- Mensaje si ya fue procesado -->
-                <div th:if="${pedidoSeleccionado.estado != 'PENDIENTE'}" style="width: 100%; text-align: center; padding: 12px; background: var(--fondo-alt); border-radius: 6px;">
-                    Este pedido ya fue procesado (Estado: <strong th:text="${pedidoSeleccionado.estado}">ACEPTADO</strong>)
-                </div>
-            </div>
-        </div>
+                <!-- 2. Si está ACEPTADO: Iniciar preparación -->
+                <form th:if="${pedidoSeleccionado.estado == 'ACEPTADO'}" th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                    <input type="hidden" name="nuevoEstado" value="EN PREPARACION">
+                    <button type="submit" class="btn-ambar" style="width: 100%; padding: 12px;">Iniciar preparación</button>
+                </form>
 
+                <!-- 3. Si está EN PREPARACION: Marcar como listo -->
+                <form th:if="${pedidoSeleccionado.estado == 'EN PREPARACION'}" th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                    <input type="hidden" name="nuevoEstado" value="LISTO">
+                    <button type="submit" class="btn-verde" style="width: 100%; padding: 12px;">Marcar como listo</button>
+                </form>
+
+                <!-- 4. Si está LISTO: Registrar entrega -->
+                <form th:if="${pedidoSeleccionado.estado == 'LISTO'}" th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                    <input type="hidden" name="nuevoEstado" value="ENTREGADO">
+                    <button type="submit" class="btn-verde" style="width: 100%; padding: 12px;">Registrar entrega</button>
+                </form>
+
+                <!-- 5. Si ya está ENTREGADO o RECHAZADO: Solo un mensaje -->
+                <div th:if="${pedidoSeleccionado.estado == 'ENTREGADO' or pedidoSeleccionado.estado == 'RECHAZADO'}"
+                     style="width: 100%; text-align: center; padding: 12px; background: var(--fondo-alt); border-radius: 6px; font-weight: 600;">
+                    Este pedido ya ha finalizado (Estado: <span th:text="${pedidoSeleccionado.estado}">ENTREGADO</span>)
+                </div>
+
+            </div>
+        </div> <!-- Cierre del detalle-pedido -->
         <!-- Estado vacío si no hay pedido seleccionado -->
         <div class="detalle-pedido empty-state" th:if="${pedidoSeleccionado == null}">
             <p>Selecciona un pedido de la lista para ver los detalles.</p>

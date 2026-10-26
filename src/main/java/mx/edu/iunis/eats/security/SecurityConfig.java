@@ -17,10 +17,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/register", "/login").permitAll()
+                        .requestMatchers("/admin/**").hasRole("CAFETERIA_STAFF")
                         .requestMatchers("/users/**", "/user/**").hasRole("CAFETERIA_STAFF")
                         .anyRequest().authenticated()
                 )

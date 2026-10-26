@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' · IUNIS Eats'">IUNIS Eats</title>
+    <link rel="icon" type="image/png" th:href="@{/images/logo-iunis-eats.png}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="layout-estudiante">
+
+<!-- ===== NAVBAR ===== -->
+<header class="navbar-estudiante">
+    <a th:href="@{/menu}" class="navbar-brand">
+        <img th:src="@{/images/logo-iunis-eats.png}" alt="IUNIS Eats" class="brand-logo">
+    </a>
+    <div class="navbar-actions">
+        <!-- Botón de Menú -->
+        <a th:href="@{/menu}" class="btn-outline-sm" style="text-decoration: none; margin-right: 8px;">Menú</a>
+
+        <!-- Botón de Carrito (NUEVO) -->
+        <a th:href="@{/carrito}" class="btn-outline-sm" style="text-decoration: none; margin-right: 8px;">Carrito</a>
+
+        <!-- Botón de Mis Pedidos -->
+        <a th:href="@{/mis-pedidos}" class="btn-outline-sm" style="text-decoration: none; margin-right: 8px;">Mis pedidos</a>
+
+        <!-- Botón de Cerrar Sesión -->
+        <form th:action="@{/logout}" method="post" style="margin: 0;">
+            <button type="submit" class="btn-outline-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+</header>
+
+<!-- ===== FRANJA DE PERIODO (Opcional, se puede ocultar) ===== -->
+<div class="periodo-banner" th:if="${mostrarBanner != false}">
+    Periodo abierto hasta las 13:00 hrs
+</div>
+
+<!-- ===== CONTENIDO VARIABLE ===== -->
+<main class="contenido-estudiante">
+    <div th:replace="${content}"></div>
+</main>
+
+</body>
+</html>

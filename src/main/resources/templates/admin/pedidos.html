@@ -26,24 +26,28 @@
             </div>
 
             <!-- Iteración de pedidos -->
-            <div th:each="pedido : ${pedidos}"
-                 class="card-pedido"
-                 th:classappend="${pedidoSeleccionado != null and pedido.id == pedidoSeleccionado.id} ? 'seleccionado' : ''">
+            <a th:each="pedido : ${pedidos}"
+               th:href="@{/admin/pedidos(idPedido=${pedido.id})}"
+               class="card-pedido"
+               style="text-decoration: none; color: inherit; display: block;"
+               th:classappend="${pedidoSeleccionado != null and pedido.id == pedidoSeleccionado.id} ? 'seleccionado' : ''">
 
                 <div class="card-pedido-header">
                     <strong th:text="'#' + ${pedido.id}">#43</strong>
-                    <span th:text="${#temporals.format(pedido.fechaHora, 'HH:mm')} + ' (Hace X min)'">13:05</span>
+                    <span th:text="${#temporals.format(pedido.fechaHora, 'HH:mm')}">13:05</span>
                 </div>
                 <div class="card-pedido-body">
                     <span>Estudiante: <span th:text="${pedido.idUsuario}">20230145</span></span>
-                    <strong th:text="'$' + ${pedido.total}">$95.00</strong>
+                    <strong th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">$95.00</strong>
                 </div>
                 <div class="card-pedido-footer">
-                    <span class="badge badge-success" th:text="${pedido.estado}">PENDIENTE</span>
-                    <a href="#" class="btn-outline-sm" style="font-size: 0.75rem; padding: 4px 8px;">Ver detalle</a>
+                    <span class="badge"
+                          th:classappend="${pedido.estado == 'PENDIENTE' ? 'badge-danger' : 'badge-success'}"
+                          th:text="${pedido.estado}">PENDIENTE</span>
+                    <span class="btn-outline-sm" style="font-size: 0.75rem; padding: 4px 8px;">Ver detalle</span>
                 </div>
-            </div>
-        </div>
+            </a>
+        </div> <!-- 👈 ESTE ERA EL CIERRE QUE FALTABA -->
 
         <!-- COLUMNA DERECHA: Detalle del Pedido (Comanda) -->
         <div class="detalle-pedido" th:if="${pedidoSeleccionado != null}">
@@ -62,14 +66,14 @@
             <div class="comanda">
                 <h3 class="comanda-title">COMANDA CAFETERÍA IUNIS</h3>
 
-                <!-- Aquí luego iteraremos sobre los DetallePedido reales -->
-                <div class="comanda-item">
-                    <span>2x Torta de Jamón</span>
-                    <strong>$70.00</strong>
+                <!-- Iteración real sobre los detalles del pedido -->
+                <div class="comanda-item" th:each="d : ${detalles}">
+                    <span th:text="${d.cantidad} + 'x ' + ${d.nombre}">1x Platillo</span>
+                    <strong th:text="'$' + ${d.subtotal}">$0.00</strong>
                 </div>
-                <div class="comanda-item">
-                    <span>1x Quesadilla</span>
-                    <strong>$25.00</strong>
+
+                <div th:if="${detalles == null or detalles.isEmpty()}" class="comanda-item">
+                    <span>No hay platillos registrados en esta comanda.</span>
                 </div>
 
                 <div class="comanda-total">
@@ -80,8 +84,26 @@
 
             <!-- Acciones -->
             <div class="detalle-acciones">
-                <button class="btn-verde" style="flex: 1; padding: 12px;">Aceptar pedido</button>
-                <button class="btn-cancelar" style="flex: 1; padding: 12px;">Rechazar</button>
+                <!-- Formulario para Aceptar -->
+                <form th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                    <input type="hidden" name="nuevoEstado" value="ACEPTADO">
+                    <button type="submit" class="btn-verde" style="width: 100%; padding: 12px;" th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}">
+                        Aceptar pedido
+                    </button>
+                </form>
+
+                <!-- Formulario para Rechazar -->
+                <form th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedidoSeleccionado.id})}" method="post" style="flex: 1;">
+                    <input type="hidden" name="nuevoEstado" value="RECHAZADO">
+                    <button type="submit" class="btn-cancelar" style="width: 100%; padding: 12px;" th:if="${pedidoSeleccionado.estado == 'PENDIENTE'}">
+                        Rechazar
+                    </button>
+                </form>
+
+                <!-- Mensaje si ya fue procesado -->
+                <div th:if="${pedidoSeleccionado.estado != 'PENDIENTE'}" style="width: 100%; text-align: center; padding: 12px; background: var(--fondo-alt); border-radius: 6px;">
+                    Este pedido ya fue procesado (Estado: <strong th:text="${pedidoSeleccionado.estado}">ACEPTADO</strong>)
+                </div>
             </div>
         </div>
 

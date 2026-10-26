@@ -1,48 +1,81 @@
 package mx.edu.iunis.eats.controller;
 
+import mx.edu.iunis.eats.domain.DetallePedido;
 import mx.edu.iunis.eats.domain.Pedido;
+import mx.edu.iunis.eats.domain.Platillo;
+import mx.edu.iunis.eats.repository.DetallePedidoRepository;
+import mx.edu.iunis.eats.repository.PedidoRepository;
+import mx.edu.iunis.eats.service.PlatilloService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/pedidos")
 public class AdminPedidoController {
 
+    @Autowired
+    private PedidoRepository pedidoRepository;
+
+    @Autowired
+    private DetallePedidoRepository detallePedidoRepository;
+
+    @Autowired
+    private PlatilloService platilloService;
+
     @GetMapping
-    public String listarPedidos(Model model) {
+    public String listarPedidos(@RequestParam(name = "idPedido", required = false) Long idPedido, Model model) {
         model.addAttribute("pageTitle", "Pedidos");
         model.addAttribute("breadcrumb", "Pedidos / Recepción de comandas");
         model.addAttribute("pantallaActual", "pedidos");
 
-        // --- DATOS DE PRUEBA (MOCK) ---
-        List<Pedido> pedidosMock = new ArrayList<>();
+        List<Pedido> pedidos = pedidoRepository.findAllByOrderByFechaHoraDesc();
+        model.addAttribute("pedidos", pedidos);
 
-        Pedido p1 = new Pedido();
-        p1.setId(43L);
-        p1.setIdUsuario(20230145L);
-        p1.setFechaHora(LocalDateTime.now().minusMinutes(3));
-        p1.setTotal(new BigDecimal("95.00"));
-        p1.setEstado("PENDIENTE");
-        pedidosMock.add(p1);
+        // Si se envió un ID, buscamos ese pedido. Si no, cargamos el más reciente.
+        Pedido seleccionado = null;
+        if (idPedido != null) {
+            seleccionado = pedidoRepository.findById(idPedido).orElse(null);
+        } else if (!pedidos.isEmpty()) {
+            seleccionado = pedidos.get(0); // El más reciente
+        }
+        model.addAttribute("pedidoSeleccionado", seleccionado);
 
-        Pedido p2 = new Pedido();
-        p2.setId(44L);
-        p2.setIdUsuario(20230152L);
-        p2.setFechaHora(LocalDateTime.now().minusMinutes(12));
-        p2.setTotal(new BigDecimal("50.00"));
-        p2.setEstado("PENDIENTE");
-        pedidosMock.add(p2);
+        // Si hay un pedido seleccionado, buscamos sus detalles reales
+        if (seleccionado != null) {
+            List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido(seleccionado.getId());
+            List<Map<String, Object>> detallesView = new ArrayList<>();
 
-        model.addAttribute("pedidos", pedidosMock);
-        model.addAttribute("pedidoSeleccionado", pedidosMock.isEmpty() ? null : pedidosMock.get(0));
+            for (DetallePedido d : detalles) {
+                Platillo platillo = platilloService.obtenerPorId(d.getIdPlatillo()).orElse(null);
+                String nombre = (platillo != null) ? platillo.getNombre() : "Platillo Desconocido";
+
+                Map<String, Object> item = new HashMap<>();
+                item.put("nombre", nombre);
+                item.put("cantidad", d.getCantidad());
+                BigDecimal subtotal = d.getPrecioAplicado().multiply(new BigDecimal(d.getCantidad()));
+                item.put("subtotal", subtotal);
+                detallesView.add(item);
+            }
+            model.addAttribute("detalles", detallesView);
+        }
 
         return "admin/pedidos";
+    }
+
+    @PostMapping("/cambiar-estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, @RequestParam String nuevoEstado) {
+        pedidoRepository.findById(id).ifPresent(pedido -> {
+            pedido.setEstado(nuevoEstado);
+            pedidoRepository.save(pedido);
+        });
+        return "redirect:/admin/pedidos?idPedido=" + id; // Mantiene el pedido seleccionado
     }
 }

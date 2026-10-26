@@ -1230,3 +1230,36 @@ img { max-width: 100%; display: block; }
     gap: 12px;
     margin-top: 24px;
 }
+/* ============================================================
+   ARREGLO DEFINITIVO DEL PANEL DE PEDIDOS (Dos columnas)
+   ============================================================ */
+
+.pedidos-layout {
+    display: grid !important;
+    grid-template-columns: 420px 1fr !important; /* Izquierda fija de 420px, derecha toma el resto */
+    gap: 24px !important;
+    height: calc(100vh - 140px) !important;
+    align-items: start !important;
+}
+
+.lista-pedidos {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+    padding-right: 8px !important;
+}
+
+/* Forzar a que las tarjetas de la lista no se estiren */
+.lista-pedidos a.card-pedido {
+    display: block !important;
+    width: 100% !important;
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.detalle-pedido {
+    height: 100% !important;
+    overflow-y: auto !important;
+}

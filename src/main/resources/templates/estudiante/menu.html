@@ -1,34 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${appName} + ' - Menú'">Menú - IUNIS Eats</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
-</head>
-<body class="layout-estudiante">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-estudiante :: layout(~{::content})}">
+<body>
 
-<header class="navbar-estudiante">
-    <a th:href="@{/}" class="navbar-brand">
-        <img th:src="@{/images/logo-iunis-eats.png}"
-             alt="IUNIS Eats"
-             class="brand-logo">
-    </a>
-    <div class="navbar-actions">
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn-outline-sm">Cerrar Sesión</button>
-        </form>
-    </div>
-</header>
-
-<div class="periodo-banner">
-    Periodo abierto hasta las 13:00 hrs
-</div>
-
-<main class="contenido-estudiante">
+<th:block th:fragment="content">
 
     <div class="page-header">
         <p class="eyebrow">Periodo del día</p>
@@ -36,15 +11,18 @@
         <p class="page-subtitle">Consulta los platillos disponibles antes del receso.</p>
     </div>
 
+    <!-- Tabs de categorías -->
     <div class="tabs-categoria">
-        <button class="tab active" data-categoria="todos">Todos</button>
-        <button class="tab" data-categoria="comida">Comidas</button>
-        <button class="tab" data-categoria="bebida">Bebidas</button>
-        <button class="tab" data-categoria="snack">Snacks</button>
+        <!-- Agregamos type="button" para evitar que se comporten como formularios -->
+        <button type="button" class="tab active" data-categoria="todos">Todos</button>
+        <button type="button" class="tab" data-categoria="comida">Comidas</button>
+        <button type="button" class="tab" data-categoria="bebida">Bebidas</button>
+        <button type="button" class="tab" data-categoria="snack">Snacks</button>
     </div>
 
+    <!-- Grid de platillos -->
     <div class="grid-platillos">
-        <article class="card-platillo" th:each="p : ${platillos}">
+        <article class="card-platillo" th:each="p : ${platillos}" th:attr="data-categoria=${#strings.toLowerCase(p.categoria)}">
 
             <div class="card-image">
                 <img th:if="${p.imagen != null and !p.imagen.isEmpty()}"
@@ -68,12 +46,14 @@
                     </span>
                 </div>
 
-                <button class="btn-primary btn-full"
-                        type="button"
-                        th:disabled="${!p.disponibilidad}"
-                        th:text="${p.disponibilidad} ? 'Agregar al pedido' : 'No disponible'">
-                    Agregar al pedido
-                </button>
+                <form th:action="@{/carrito/agregar/{id}(id=${p.id})}" method="post" style="margin-top: 12px;">
+                    <button class="btn-primary btn-full"
+                            type="submit"
+                            th:disabled="${!p.disponibilidad}"
+                            th:text="${p.disponibilidad} ? 'Agregar al pedido' : 'No disponible'">
+                        Agregar al pedido
+                    </button>
+                </form>
             </div>
 
         </article>
@@ -84,7 +64,36 @@
         </div>
     </div>
 
-</main>
+    <!-- Script para los filtros (AHORA SÍ, DENTRO DEL FRAGMENTO) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const botones = document.querySelectorAll('.tab');
+            const tarjetas = document.querySelectorAll('.card-platillo');
+
+            botones.forEach(boton => {
+                boton.addEventListener('click', function() {
+                    // Cambiar clase activa
+                    botones.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Filtrar
+                    const categoriaSeleccionada = this.getAttribute('data-categoria');
+
+                    tarjetas.forEach(tarjeta => {
+                        const categoriaTarjeta = tarjeta.getAttribute('data-categoria');
+
+                        if (categoriaSeleccionada === 'todos' || categoriaSeleccionada === categoriaTarjeta) {
+                            tarjeta.style.display = 'flex';
+                        } else {
+                            tarjeta.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
+</th:block>
 
 </body>
 </html>

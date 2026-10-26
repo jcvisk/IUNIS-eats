@@ -7,4 +7,6 @@ import java.util.List;
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByEstadoOrderByFechaHoraAsc(String estado);
     List<Pedido> findAllByOrderByFechaHoraDesc();
+
+    long countByEstado(String estado);
 }

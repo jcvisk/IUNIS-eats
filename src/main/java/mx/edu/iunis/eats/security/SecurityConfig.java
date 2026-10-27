@@ -19,9 +19,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/images/**", "/register", "/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("CAFETERIA_STAFF")
-                        .requestMatchers("/users/**", "/user/**").hasRole("CAFETERIA_STAFF")
+                        // Agregamos /manifest.json y /sw.js para que Chrome pueda instalar la PWA
+                        .requestMatchers("/css/**", "/images/**", "/manifest.json", "/sw.js", "/register", "/login").permitAll()
+
+                        // Usamos hasAuthority para que coincida con tu base de datos
+                        .requestMatchers("/admin/**").hasAuthority("CAFETERIA_STAFF")
+                        .requestMatchers("/users/**", "/user/**").hasAuthority("CAFETERIA_STAFF")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -1,0 +1,23 @@
+{
+  "name": "IUNIS Eats",
+  "short_name": "IUNIS Eats",
+  "description": "PWA para la cafeteria del Instituto Universitario del Sureste",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F6F3",
+  "theme_color": "#1A4D1A",
+  "icons": [
+    {
+      "src": "/images/logo-iunis-eats.png",
+      "sizes": "372x372",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/logo-iunis-eats.png",
+      "sizes": "372x372",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -5,6 +5,13 @@
 
 <th:block th:fragment="content">
 
+    <!-- Bloque de mensajes de éxito o error -->
+    <div th:if="${mensaje}" style="background: var(--verde-claro); color: var(--verde); padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600;">
+        <span th:text="${mensaje}"></span>
+    </div>
+    <div th:if="${error}" style="background: var(--rojo-claro); color: var(--rojo); padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600;">
+        <span th:text="${error}"></span>
+    </div>
     <!-- Encabezado de la página -->
     <div class="page-header-admin">
         <h1 class="page-title-admin">Catálogo de platillos</h1>
@@ -80,9 +87,15 @@
                 <!-- Acciones -->
                 <td class="celda-acciones">
                     <a th:href="@{/admin/platillos/editar/{id}(id=${p.id})}" class="link-accion">Editar</a>
-                    <a th:href="@{/admin/platillos/eliminar/{id}(id=${p.id})}"
-                       class="link-accion link-danger"
-                       onclick="return confirm('¿Eliminar este platillo?')">Eliminar</a>
+
+                    <!-- Botón de eliminar usando POST (Seguro) -->
+                    <form th:action="@{/admin/platillos/eliminar/{id}(id=${p.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="link-accion link-danger"
+                                style="background:none; border:none; cursor:pointer; padding:0; font-family:inherit; font-size:inherit;"
+                                onclick="return confirm('¿Eliminar este platillo permanentemente?')">
+                            Eliminar
+                        </button>
+                    </form>
                 </td>
             </tr>
 

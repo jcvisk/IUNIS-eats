@@ -8,17 +8,18 @@ import mx.edu.iunis.eats.repository.DetallePedidoRepository;
 import mx.edu.iunis.eats.repository.NotificacionRepository;
 import mx.edu.iunis.eats.repository.PedidoRepository;
 import mx.edu.iunis.eats.service.PlatilloService;
+import mx.edu.iunis.eats.service.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import mx.edu.iunis.eats.domain.Combo;
 
 @Controller
 @RequestMapping("/admin/pedidos")
@@ -32,6 +33,9 @@ public class AdminPedidoController {
 
     @Autowired
     private PlatilloService platilloService;
+
+    @Autowired
+    private ComboService comboService;
 
     @Autowired
     private NotificacionRepository notificacionRepository;
@@ -58,13 +62,23 @@ public class AdminPedidoController {
             List<Map<String, Object>> detallesView = new ArrayList<>();
 
             for (DetallePedido d : detalles) {
-                Platillo platillo = platilloService.obtenerPorId(d.getIdPlatillo()).orElse(null);
-                String nombre = (platillo != null) ? platillo.getNombre() : "Platillo Desconocido";
+                String nombre;
+
+                if (d.getIdCombo() != null) {
+                    Combo combo = comboService.obtenerPorId(d.getIdCombo()).orElse(null);
+                    nombre = (combo != null) ? combo.getNombre() : "Combo desconocido";
+                } else {
+                    Platillo platillo = platilloService.obtenerPorId(d.getIdPlatillo()).orElse(null);
+                    nombre = (platillo != null) ? platillo.getNombre() : "Platillo desconocido";
+                }
 
                 Map<String, Object> item = new HashMap<>();
                 item.put("nombre", nombre);
                 item.put("cantidad", d.getCantidad());
-                BigDecimal subtotal = d.getPrecioAplicado().multiply(new BigDecimal(d.getCantidad()));
+
+                BigDecimal subtotal = d.getPrecioAplicado()
+                        .multiply(new BigDecimal(d.getCantidad()));
+
                 item.put("subtotal", subtotal);
                 detallesView.add(item);
             }

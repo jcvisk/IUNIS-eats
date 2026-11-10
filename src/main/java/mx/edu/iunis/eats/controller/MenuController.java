@@ -18,8 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mx.edu.iunis.eats.domain.Combo;
+import mx.edu.iunis.eats.service.ComboService;
+
 @Controller
 public class MenuController {
+
+    @Autowired
+    private ComboService comboService;
 
     @Autowired
     private PlatilloService platilloService;
@@ -36,6 +42,7 @@ public class MenuController {
     public String showMenu(Model model) {
         model.addAttribute("appName", "IUNIS Eats");
         model.addAttribute("platillos", platilloService.obtenerTodos());
+        model.addAttribute("combos", comboService.listarTodos());
         return "estudiante/menu";
     }
 
@@ -59,11 +66,25 @@ public class MenuController {
             List<DetallePedido> detalles = detallePedidoRepository.findByIdPedido(pedido.getId());
             List<Map<String, Object>> listaItems = new ArrayList<>();
             for (DetallePedido d : detalles) {
-                Platillo p = platilloService.obtenerPorId(d.getIdPlatillo()).orElse(null);
+
+                String nombre;
+
+                if (d.getIdCombo() != null) {
+                    Combo combo = comboService.obtenerPorId(d.getIdCombo()).orElse(null);
+                    nombre = (combo != null) ? combo.getNombre() : "Combo desconocido";
+
+                } else {
+                    Platillo platillo = platilloService.obtenerPorId(d.getIdPlatillo()).orElse(null);
+                    nombre = (platillo != null) ? platillo.getNombre() : "Platillo desconocido";
+                }
+
                 Map<String, Object> item = new HashMap<>();
-                item.put("nombre", (p != null) ? p.getNombre() : "Desconocido");
+                item.put("nombre", nombre);
                 item.put("cantidad", d.getCantidad());
-                item.put("subtotal", d.getPrecioAplicado().multiply(new BigDecimal(d.getCantidad())));
+                item.put("subtotal", d.getPrecioAplicado().multiply(
+                        new BigDecimal(d.getCantidad())
+                ));
+
                 listaItems.add(item);
             }
             detallesPorPedido.put(pedido.getId(), listaItems);

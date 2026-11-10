@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <h1 class="page-title-admin">Nuevo combo</h1>
+
+    <form th:action="@{/admin/combos/guardar}"
+          th:object="${combo}"
+          method="post"
+          class="formulario-platillo">
+
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-grid">
+
+            <!-- Columna izquierda -->
+            <div class="form-col-izq">
+
+                <div class="campo">
+                    <label>Nombre del combo</label>
+                    <input type="text" th:field="*{nombre}" required>
+                </div>
+
+                <div class="campo">
+                    <label>Descripción del combo</label>
+                    <textarea th:field="*{descripcion}" rows="5"></textarea>
+                </div>
+
+                <div class="campo">
+                    <label>Precio del combo ($ MXN)</label>
+                    <input type="number"
+                           step="0.01"
+                           min="0.01"
+                           th:field="*{precio}"
+                           required>
+                </div>
+
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="form-col-der">
+
+                <div class="campo">
+                    <label>URL de imagen (opcional)</label>
+                    <input type="text"
+                           th:field="*{imagen}"
+                           placeholder="Ej. /images/combos/combo1.jpg">
+                </div>
+
+                <div class="preview-imagen">
+                    <img th:if="${combo.imagen != null and !combo.imagen.isEmpty()}"
+                         th:src="${combo.imagen}"
+                         alt="Vista previa del combo">
+
+                    <div th:unless="${combo.imagen != null and !combo.imagen.isEmpty()}"
+                         class="preview-vacia"></div>
+                </div>
+
+                <div class="campo-toggle">
+                    <label class="switch-label">
+                        <input type="checkbox"
+                               th:field="*{disponibilidad}"
+                               class="switch-input">
+
+                        <span class="switch-track">
+                            <span class="switch-knob"></span>
+                        </span>
+
+                        <span>Visible en el catálogo</span>
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Selección de platillos del combo -->
+        <div class="campo">
+            <h2>Platillos incluidos en el combo</h2>
+            <p>Indica la cantidad de cada platillo que deseas incluir.</p>
+
+            <div class="tabla-container">
+                <table class="tabla-admin">
+                    <thead>
+                    <tr>
+                        <th>Platillo</th>
+                        <th>Precio individual</th>
+                        <th>Cantidad</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="p : ${platillos}">
+                        <td th:text="${p.nombre}">Nombre del platillo</td>
+
+                        <td th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2)}">
+                            $0.00
+                        </td>
+
+                        <td>
+                            <input type="number"
+                                    min="0"
+                                    th:value="${cantidades != null ? cantidades.get(p.id) : 0}"
+                                    th:name="'cantidades[' + ${p.id} + ']'"
+                                    style="width: 80px;">
+                        </td>
+                    </tr>
+
+                    <tr th:if="${platillos == null or platillos.isEmpty()}">
+                        <td colspan="3" class="tabla-vacia">
+                            No hay platillos registrados.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="form-actions-bar">
+            <button type="submit" class="btn-verde">
+                Guardar combo
+            </button>
+
+            <a th:href="@{/admin/combos}" class="btn-cancelar">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</th:block>
+
+</body>
+</html>

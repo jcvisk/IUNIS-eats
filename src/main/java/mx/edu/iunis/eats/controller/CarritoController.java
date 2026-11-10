@@ -17,12 +17,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import mx.edu.iunis.eats.service.ComboService;
+
 @Controller
 @RequestMapping("/carrito")
 public class CarritoController {
 
     @Autowired
     private PlatilloService platilloService;
+    @Autowired
+    private ComboService comboService;
     @Autowired
     private PedidoRepository pedidoRepository;
     @Autowired
@@ -57,7 +61,7 @@ public class CarritoController {
             List<CarritoItem> carrito = getCarrito(session);
             boolean existe = false;
             for (CarritoItem item : carrito) {
-                if (item.getIdPlatillo().equals(id)) {
+                if (id.equals(item.getIdPlatillo())) {
                     item.setCantidad(item.getCantidad() + 1);
                     existe = true;
                     break;
@@ -67,6 +71,37 @@ public class CarritoController {
                 carrito.add(new CarritoItem(platillo.getId(), platillo.getNombre(), new BigDecimal(platillo.getPrecio().toString()), 1));
             }
         }
+        return "redirect:/menu";
+    }
+
+    @PostMapping("/agregar-combo/{id}")
+    public String agregarCombo(@PathVariable Long id, HttpSession session) {
+
+        Combo combo = comboService.obtenerPorId(id).orElse(null);
+
+        if (combo != null && Boolean.TRUE.equals(combo.getDisponibilidad())) {
+
+            List<CarritoItem> carrito = getCarrito(session);
+            boolean existe = false;
+
+            for (CarritoItem item : carrito) {
+                if (id.equals(item.getIdCombo())) {
+                    item.setCantidad(item.getCantidad() + 1);
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                carrito.add(new CarritoItem(
+                        combo.getNombre(),
+                        combo.getPrecio(),
+                        1,
+                        combo.getId()
+                ));
+            }
+        }
+
         return "redirect:/menu";
     }
 
@@ -97,10 +132,20 @@ public class CarritoController {
 
             for (CarritoItem item : carrito) {
                 DetallePedido detalle = new DetallePedido();
+
                 detalle.setIdPedido(pedido.getId());
-                detalle.setIdPlatillo(item.getIdPlatillo());
+
+                if (item.getIdCombo() != null) {
+                    detalle.setIdCombo(item.getIdCombo());
+                    detalle.setIdPlatillo(null);
+                } else {
+                    detalle.setIdPlatillo(item.getIdPlatillo());
+                    detalle.setIdCombo(null);
+                }
+
                 detalle.setCantidad(item.getCantidad());
                 detalle.setPrecioAplicado(item.getPrecio());
+
                 detallePedidoRepository.save(detalle);
             }
             carrito.clear();

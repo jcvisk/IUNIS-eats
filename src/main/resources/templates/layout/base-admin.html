@@ -30,7 +30,7 @@
             <div class="user-role">Personal de cafetería</div>
         </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Navegación administrativa">
             <a th:href="@{/admin}" class="nav-item"
                th:classappend="${pantallaActual == 'panel'} ? 'active' : ''">
                 Panel
@@ -70,6 +70,24 @@
                 <span class="status-item" th:text="${estadoTurno != null ? estadoTurno : 'Turno Activo'}">Turno Activo</span>
             </div>
         </header>
+        <!-- Mensajes generales del sistema -->
+        <div class="mensajes-sistema"
+             th:if="${successMessage != null or errorMessage != null}">
+
+            <div class="alert alert-success"
+                 th:if="${successMessage != null}"
+                 role="status"
+                 aria-live="polite">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div class="alert alert-error"
+                 th:if="${errorMessage != null}"
+                 role="alert">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+        </div>
 
         <section class="admin-content">
             <div th:replace="${content}"></div>

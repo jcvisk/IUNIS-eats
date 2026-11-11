@@ -64,6 +64,68 @@
         </div>
     </div>
 
+    <!-- Sección de combos -->
+    <div class="page-header" style="margin-top: 35px;">
+        <p class="eyebrow">Promociones</p>
+        <h2 class="page-title">Combos disponibles</h2>
+        <p class="page-subtitle">
+            Disfruta nuestras combinaciones especiales.
+        </p>
+    </div>
+
+    <div class="grid-platillos">
+
+        <article class="card-platillo" th:each="c : ${combos}">
+
+            <div class="card-image">
+                <img th:if="${c.imagen != null and !c.imagen.isEmpty()}"
+                     th:src="${c.imagen}"
+                     th:alt="${c.nombre}">
+
+                <div th:unless="${c.imagen != null and !c.imagen.isEmpty()}"
+                     class="image-placeholder"></div>
+            </div>
+
+            <div class="card-body">
+                <h3 th:text="${c.nombre}">Nombre del combo</h3>
+
+                <p th:text="${c.descripcion}">Descripción del combo</p>
+
+                <div class="card-footer">
+                <span class="price"
+                      th:text="'$' + ${#numbers.formatDecimal(c.precio, 1, 2)}">
+                    $0.00
+                </span>
+
+                    <span class="badge"
+                          th:classappend="${c.disponibilidad} ? 'badge-success' : 'badge-danger'"
+                          th:text="${c.disponibilidad} ? 'Disponible' : 'Agotado'">
+                    Disponible
+                </span>
+                </div>
+
+                <form th:action="@{/carrito/agregar-combo/{id}(id=${c.id})}"
+                      method="post"
+                      style="margin-top: 12px;">
+
+                    <button class="btn-primary btn-full"
+                            type="submit"
+                            th:disabled="${!c.disponibilidad}"
+                            th:text="${c.disponibilidad} ? 'Agregar al pedido' : 'No disponible'">
+                        Agregar al pedido
+                    </button>
+                </form>
+            </div>
+
+        </article>
+
+        <div th:if="${combos == null or combos.isEmpty()}"
+             style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--texto-sec);">
+            Aún no hay combos publicados.
+        </div>
+
+    </div>
+
     <!-- Script para los filtros (AHORA SÍ, DENTRO DEL FRAGMENTO) -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {

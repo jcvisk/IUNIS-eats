@@ -87,9 +87,11 @@ public class AdminComboController {
     @PostMapping("/guardar")
     public String guardar(
             @ModelAttribute Combo combo,
-            @RequestParam Map<String, String> parametros) {
+            @RequestParam Map<String, String> parametros,
+            Model model) {
 
         List<ComboPlatillo> componentes = new ArrayList<>();
+        String error = null;
 
         for (Map.Entry<String, String> entrada : parametros.entrySet()) {
 
@@ -98,8 +100,38 @@ public class AdminComboController {
             if (clave.startsWith("cantidades[") && clave.endsWith("]")) {
 
                 String idTexto = clave.substring(11, clave.length() - 1);
-                Long idPlatillo = Long.parseLong(idTexto);
-                Integer cantidad = Integer.parseInt(entrada.getValue());
+                Long idPlatillo;
+                Integer cantidad;
+
+                try {
+                    idPlatillo = Long.parseLong(idTexto);
+                } catch (NumberFormatException e) {
+                    error = "El identificador de un platillo no es válido.";
+                    break;
+                }
+
+                if (platilloService.obtenerPorId(idPlatillo).isEmpty()) {
+                    error = "Uno de los platillos seleccionados no existe.";
+                    break;
+                }
+
+                String valor = entrada.getValue();
+
+                if (valor == null || valor.isBlank()) {
+                    cantidad = 0;
+                } else {
+                    try {
+                        cantidad = Integer.parseInt(valor);
+                    } catch (NumberFormatException e) {
+                        error = "La cantidad debe ser un número entero válido.";
+                        break;
+                    }
+                }
+
+                if (cantidad < 0) {
+                    error = "La cantidad no puede ser negativa.";
+                    break;
+                }
 
                 if (cantidad > 0) {
                     componentes.add(
@@ -109,9 +141,72 @@ public class AdminComboController {
             }
         }
 
-        comboService.guardar(combo, componentes);
+        if (error != null) {
 
-        return "redirect:/admin/combos";
+            Map<Long, String> cantidadesFormulario = new java.util.HashMap<>();
+
+            for (Map.Entry<String, String> entrada : parametros.entrySet()) {
+
+                String clave = entrada.getKey();
+
+                if (clave.startsWith("cantidades[") && clave.endsWith("]")) {
+                    try {
+                        Long id = Long.parseLong(
+                                clave.substring(11, clave.length() - 1)
+                        );
+
+                        cantidadesFormulario.put(id, entrada.getValue());
+
+                    } catch (NumberFormatException e) {
+                        // El identificador inválido ya fue detectado.
+                    }
+                }
+            }
+
+            model.addAttribute("pageTitle", "Formulario de combo");
+            model.addAttribute("breadcrumb", "Catálogo / Combos");
+            model.addAttribute("pantallaActual", "combos");
+            model.addAttribute("platillos", platilloService.obtenerTodos());
+            model.addAttribute("cantidades", cantidadesFormulario);
+            model.addAttribute("error", error);
+
+            return "admin/formulario-combo";
+        }
+
+        try {
+            comboService.guardar(combo, componentes);
+            return "redirect:/admin/combos";
+
+        } catch (IllegalArgumentException e) {
+            Map<Long, String> cantidadesFormulario = new java.util.HashMap<>();
+
+            for (Map.Entry<String, String> entrada : parametros.entrySet()) {
+
+                String clave = entrada.getKey();
+
+                if (clave.startsWith("cantidades[") && clave.endsWith("]")) {
+                    try {
+                        Long id = Long.parseLong(
+                                clave.substring(11, clave.length() - 1)
+                        );
+
+                        cantidadesFormulario.put(id, entrada.getValue());
+
+                    } catch (NumberFormatException ignored) {
+                        // El identificador inválido ya fue detectado.
+                    }
+                }
+            }
+
+            model.addAttribute("pageTitle", "Formulario de combo");
+            model.addAttribute("breadcrumb", "Catálogo / Combos");
+            model.addAttribute("pantallaActual", "combos");
+            model.addAttribute("platillos", platilloService.obtenerTodos());
+            model.addAttribute("cantidades", cantidadesFormulario);
+            model.addAttribute("error", e.getMessage());
+
+            return "admin/formulario-combo";
+        }
     }
 
 }

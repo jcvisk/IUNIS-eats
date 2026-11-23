@@ -6,6 +6,10 @@
 <th:block th:fragment="content">
 
     <h1 class="page-title-admin">Nuevo combo</h1>
+    <div th:if="${error != null}"
+         class="mensaje-error"
+         th:text="${error}">
+    </div>
 
     <form th:action="@{/admin/combos/guardar}"
           th:object="${combo}"
@@ -103,7 +107,7 @@
                         <td>
                             <input type="number"
                                     min="0"
-                                    th:value="${cantidades != null ? cantidades.get(p.id) : 0}"
+                                   th:value="${cantidades != null and cantidades.containsKey(p.id) ? cantidades.get(p.id) : 0}"
                                     th:name="'cantidades[' + ${p.id} + ']'"
                                     style="width: 80px;">
                         </td>

@@ -1263,3 +1263,24 @@ img { max-width: 100%; display: block; }
     height: 100% !important;
     overflow-y: auto !important;
 }
+
+/* Mantener la apariencia de botón en los enlaces de navegación */
+.navbar-actions .btn-outline-sm {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Alinear mensajes del estudiante con el contenido principal */
+.layout-estudiante .mensajes-sistema {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 40px 0;
+}
+
+@media (max-width: 640px) {
+    .layout-estudiante .mensajes-sistema {
+        padding: 16px 20px 0;
+    }
+}

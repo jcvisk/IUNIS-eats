@@ -1264,6 +1264,79 @@ img { max-width: 100%; display: block; }
     overflow-y: auto !important;
 }
 
+/* ============================================================
+   MENSAJES GENERALES DEL SISTEMA
+   Confirmaciones y errores para administrador y estudiante
+   ============================================================ */
+
+.mensajes-sistema {
+    width: 100%;
+    padding: 16px 32px 0;
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.alert-success {
+    background: var(--verde-claro);
+    color: var(--verde);
+    border-color: rgba(26, 77, 26, 0.2);
+}
+
+.alert-error {
+    background: var(--rojo-claro);
+    color: var(--rojo);
+    border-color: rgba(168, 50, 50, 0.2);
+}
+
+/* Formulario de cierre de sesión del estudiante */
+.form-logout-estudiante {
+    margin: 0;
+}
+
+/* Accesibilidad: indicador visible al navegar con teclado */
+.navbar-actions a:focus-visible,
+.navbar-actions button:focus-visible {
+    outline: 3px solid var(--ambar);
+    outline-offset: 3px;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 640px) {
+
+    .navbar-estudiante {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .navbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .mensajes-sistema {
+        padding: 16px 20px 0;
+    }
+
+    .alert {
+        padding: 12px 14px;
+        font-size: 0.8125rem;
+    }
+}
+
 /* Mantener la apariencia de botón en los enlaces de navegación */
 .navbar-actions .btn-outline-sm {
     text-decoration: none;

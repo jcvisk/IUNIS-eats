@@ -14,13 +14,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import mx.edu.iunis.eats.service.ComboService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/carrito")
@@ -28,6 +29,9 @@ public class CarritoController {
 
     @Autowired
     private PlatilloService platilloService;
+
+    @Autowired
+    private ComboService comboService;
 
     @Autowired
     private PedidoRepository pedidoRepository;
@@ -48,6 +52,30 @@ public class CarritoController {
         return carrito;
     }
 
+    private boolean componentesDisponibles(Long idCombo) {
+
+        List<ComboPlatillo> componentes =
+                comboService.obtenerComponentes(idCombo);
+
+        if (componentes == null || componentes.isEmpty()) {
+            return false;
+        }
+
+        for (ComboPlatillo componente : componentes) {
+
+            Platillo platillo = platilloService
+                    .obtenerPorId(componente.getIdPlatillo())
+                    .orElse(null);
+
+            if (platillo == null ||
+                    !Boolean.TRUE.equals(platillo.getDisponibilidad())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @GetMapping
     public String verCarrito(HttpSession session, Model model) {
         List<CarritoItem> carrito = getCarrito(session);
@@ -65,7 +93,7 @@ public class CarritoController {
             List<CarritoItem> carrito = getCarrito(session);
             boolean existe = false;
             for (CarritoItem item : carrito) {
-                if (item.getIdPlatillo().equals(id)) {
+                if (id.equals(item.getIdPlatillo())) {
                     item.setCantidad(item.getCantidad() + 1);
                     existe = true;
                     break;
@@ -75,6 +103,39 @@ public class CarritoController {
                 carrito.add(new CarritoItem(platillo.getId(), platillo.getNombre(), new BigDecimal(platillo.getPrecio().toString()), 1));
             }
         }
+        return "redirect:/menu";
+    }
+
+    @PostMapping("/agregar-combo/{id}")
+    public String agregarCombo(@PathVariable Long id, HttpSession session) {
+
+        Combo combo = comboService.obtenerPorId(id).orElse(null);
+
+        if (combo != null
+                && Boolean.TRUE.equals(combo.getDisponibilidad())
+                && componentesDisponibles(id)) {
+
+            List<CarritoItem> carrito = getCarrito(session);
+            boolean existe = false;
+
+            for (CarritoItem item : carrito) {
+                if (id.equals(item.getIdCombo())) {
+                    item.setCantidad(item.getCantidad() + 1);
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                carrito.add(new CarritoItem(
+                        combo.getNombre(),
+                        combo.getPrecio(),
+                        1,
+                        combo.getId()
+                ));
+            }
+        }
+
         return "redirect:/menu";
     }
 
@@ -131,8 +192,52 @@ public class CarritoController {
     // ---------------------------------------------
 
     @PostMapping("/confirmar")
-    public String confirmar(HttpSession session, Authentication authentication) {
+    public String confirmar(
+            HttpSession session,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         List<CarritoItem> carrito = getCarrito(session);
+        // Verificar nuevamente la disponibilidad antes de crear el pedido.
+        for (CarritoItem item : carrito) {
+
+            if (item.getIdCombo() != null) {
+
+                Combo combo = comboService
+                        .obtenerPorId(item.getIdCombo())
+                        .orElse(null);
+
+                if (combo == null
+                        || !Boolean.TRUE.equals(combo.getDisponibilidad())
+                        || !componentesDisponibles(item.getIdCombo())) {
+
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            "El combo \"" + item.getNombre()
+                                    + "\" o alguno de sus platillos ya no está disponible."
+                    );
+
+                    return "redirect:/carrito";
+                }
+
+            } else if (item.getIdPlatillo() != null) {
+
+                Platillo platillo = platilloService
+                        .obtenerPorId(item.getIdPlatillo())
+                        .orElse(null);
+
+                if (platillo == null
+                        || !Boolean.TRUE.equals(platillo.getDisponibilidad())) {
+
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            "El platillo \"" + item.getNombre()
+                                    + "\" ya no está disponible."
+                    );
+
+                    return "redirect:/carrito";
+                }
+            }
+        }
 
         if (!carrito.isEmpty()) {
             String username = authentication.getName();
@@ -151,10 +256,20 @@ public class CarritoController {
 
             for (CarritoItem item : carrito) {
                 DetallePedido detalle = new DetallePedido();
+
                 detalle.setIdPedido(pedido.getId());
-                detalle.setIdPlatillo(item.getIdPlatillo());
+
+                if (item.getIdCombo() != null) {
+                    detalle.setIdCombo(item.getIdCombo());
+                    detalle.setIdPlatillo(null);
+                } else {
+                    detalle.setIdPlatillo(item.getIdPlatillo());
+                    detalle.setIdCombo(null);
+                }
+
                 detalle.setCantidad(item.getCantidad());
                 detalle.setPrecioAplicado(item.getPrecio());
+
                 detallePedidoRepository.save(detalle);
             }
             carrito.clear();

@@ -46,6 +46,10 @@
                th:classappend="${pantallaActual == 'platillos'} ? 'active' : ''">
                 Platillos
             </a>
+            <a th:href="@{/admin/combos}" class="nav-item"
+               th:classappend="${pantallaActual == 'combos'} ? 'active' : ''">
+                Combos
+            </a>
             <a th:href="@{/admin/menu}" class="nav-item"
                th:classappend="${pantallaActual == 'menu'} ? 'active' : ''">
                 Menú del día

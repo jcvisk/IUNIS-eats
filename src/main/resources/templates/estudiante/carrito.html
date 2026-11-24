@@ -10,6 +10,11 @@
         <h1 class="page-title">Tu pedido</h1>
     </div>
 
+    <div th:if="${error != null}"
+         class="mensaje-error"
+         th:text="${error}">
+    </div>
+
     <div class="card-platillo" style="padding: 24px; max-width: 800px; margin: 0 auto;">
 
         <div th:if="${carrito != null and !carrito.isEmpty()}">

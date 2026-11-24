@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css?v=2}">
 </head>
 <body class="layout-admin">
 
@@ -30,7 +30,7 @@
             <div class="user-role">Personal de cafetería</div>
         </div>
 
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" aria-label="Navegación administrativa">
             <a th:href="@{/admin}" class="nav-item"
                th:classappend="${pantallaActual == 'panel'} ? 'active' : ''">
                 Panel
@@ -45,6 +45,10 @@
             <a th:href="@{/admin/platillos}" class="nav-item"
                th:classappend="${pantallaActual == 'platillos'} ? 'active' : ''">
                 Platillos
+            </a>
+            <a th:href="@{/admin/combos}" class="nav-item"
+               th:classappend="${pantallaActual == 'combos'} ? 'active' : ''">
+                Combos
             </a>
             <a th:href="@{/admin/menu}" class="nav-item"
                th:classappend="${pantallaActual == 'menu'} ? 'active' : ''">
@@ -70,6 +74,24 @@
                 <span class="status-item" th:text="${estadoTurno != null ? estadoTurno : 'Turno Activo'}">Turno Activo</span>
             </div>
         </header>
+        <!-- Mensajes generales del sistema -->
+        <div class="mensajes-sistema"
+             th:if="${successMessage != null or errorMessage != null}">
+
+            <div class="alert alert-success"
+                 th:if="${successMessage != null}"
+                 role="status"
+                 aria-live="polite">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div class="alert alert-error"
+                 th:if="${errorMessage != null}"
+                 role="alert">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+        </div>
 
         <section class="admin-content">
             <div th:replace="${content}"></div>

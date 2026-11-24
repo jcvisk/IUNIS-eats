@@ -1393,3 +1393,177 @@ img { max-width: 100%; display: block; }
         padding: 16px 20px 0;
     }
 }
+
+/* ============================================================
+   MENÚ DEL ESTUDIANTE - ESTILO CAMPUS FRESH
+   ============================================================ */
+
+/* Encabezado */
+.layout-estudiante .menu-header {
+    margin-bottom: 24px;
+    padding-top: 16px;
+}
+.layout-estudiante .menu-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--verde);
+    letter-spacing: -0.03em;
+    margin-top: 4px;
+}
+
+/* Tabs (Chips) */
+.layout-estudiante .tabs-categoria {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: nowrap;
+    overflow-x: auto; /* Scroll horizontal en móviles */
+    padding-bottom: 8px;
+    scrollbar-width: none;
+}
+.layout-estudiante .tabs-categoria::-webkit-scrollbar { display: none; }
+
+.layout-estudiante .tab {
+    padding: 10px 20px;
+    border-radius: 50px; /* Forma de píldora */
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--blanco);
+    color: var(--texto-sec);
+    border: 1px solid var(--borde-suave, #EAEAEA);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.layout-estudiante .tab:hover { border-color: var(--verde); }
+.layout-estudiante .tab.active {
+    background: var(--verde);
+    color: var(--blanco);
+    border-color: var(--verde);
+    box-shadow: 0 4px 12px rgba(26, 77, 26, 0.2);
+}
+
+/* Grid de 2 columnas (Incluso en escritorio para que se vea como app) */
+.layout-estudiante .grid-platillos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* 2 col en móvil, más en desktop */
+    gap: 16px;
+}
+
+/* Tarjeta del platillo */
+.layout-estudiante .card-platillo {
+    background: var(--blanco);
+    border: 1px solid var(--borde-suave, #EAEAEA);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.layout-estudiante .card-platillo:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+}
+
+/* Imagen */
+.layout-estudiante .card-image {
+    aspect-ratio: 1/1; /* Cuadrada */
+    background: var(--verde-claro);
+    position: relative;
+}
+.layout-estudiante .card-image img { width: 100%; height: 100%; object-fit: cover; }
+.layout-estudiante .image-placeholder {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--verde); font-size: 0.8rem; font-weight: 600;
+}
+
+/* Cuerpo de la tarjeta */
+.layout-estudiante .card-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.layout-estudiante .card-info h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--texto);
+    margin-bottom: 4px;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.2;
+}
+.layout-estudiante .card-info p {
+    font-size: 0.75rem;
+    color: var(--texto-sec);
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Fila inferior: Precio y Botón */
+.layout-estudiante .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.layout-estudiante .price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--ambar);
+}
+
+.layout-estudiante .btn-add-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--verde);
+    color: var(--blanco);
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    line-height: 1;
+    padding-bottom: 2px; /* Ajuste óptico para el signo + */
+}
+.layout-estudiante .btn-add-circle:hover { background-color: var(--verde-oscuro); }
+.layout-estudiante .btn-add-circle:active { transform: scale(0.9); }
+.layout-estudiante .btn-add-circle:disabled {
+    background-color: var(--borde);
+    color: var(--texto-sec);
+    cursor: not-allowed;
+}
+/* Botón de restar en el carrito */
+.layout-estudiante .btn-restar {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--texto);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.layout-estudiante .btn-restar:hover {
+    background: var(--rojo-claro);
+    color: var(--rojo);
+    border-color: var(--rojo);
+}

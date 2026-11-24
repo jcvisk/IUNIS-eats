@@ -1,0 +1,217 @@
+/* ============================================================
+   LOGIN - ANIMACIONES Y UX MEJORADA (VERSIÓN FINAL)
+   ============================================================ */
+
+/* Fondo animado (Formas flotantes) */
+
+.bg-shape {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    filter: blur(50px); /* Más difuminado para que sea sutil */
+    z-index: 1;
+    opacity: 0.30; /* Aún más sutil */
+    animation: float 10s ease-in-out infinite alternate; /* 20s para que sea lento */
+}
+.shape-1 { width: 500px; height: 500px; background: var(--verde); top: -150px; left: -150px; }
+.shape-2 { width: 400px; height: 400px; background: var(--ambar); bottom: -100px; right: -100px; animation-delay: -2s; }
+.shape-3 { width: 350px; height: 350px; background: var(--verde-claro); top: 40%; left: 50%; animation-delay: -5s; }
+
+@keyframes float {
+    0% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); }
+    50% { transform: translateY(-40px) translateX(20px) rotate(10deg) scale(1.05); }
+    100% { transform: translateY(0px) translateX(0px) rotate(0deg) scale(1); }
+}
+
+/* Animación en cascada para que los elementos entren uno por uno */
+.auth-card .auth-logo-container,
+.auth-card .auth-title,
+.auth-card .auth-subtitle,
+.auth-card .campo,
+.auth-card .btn-pill,
+.auth-card .auth-link {
+    opacity: 0;
+    animation: slideUpStagger 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Retrasos para efecto cascada */
+.auth-card .auth-logo-container { animation-delay: 0.1s; }
+.auth-card .auth-title { animation-delay: 0.2s; }
+.auth-card .auth-subtitle { animation-delay: 0.3s; }
+.auth-card .campo:nth-child(1) { animation-delay: 0.4s; }
+.auth-card .campo:nth-child(2) { animation-delay: 0.5s; }
+.auth-card .btn-pill { animation-delay: 0.6s; }
+.auth-card .auth-link { animation-delay: 0.7s; }
+
+@keyframes slideUpStagger {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Contenedor principal del login */
+.auth-wrapper {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--fondo);
+    padding: 20px;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden; /* Para que las formas no hagan scroll */
+}
+
+/* Tarjeta animada */
+.auth-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--borde-suave, #EAEAEA);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(30px);
+    position: relative;
+    z-index: 10;
+}
+
+@keyframes slideUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo y Títulos */
+.auth-logo-container { margin-bottom: 32px; }
+.auth-logo { height: 80px; width: auto; margin: 0 auto; display: block; }
+.auth-card .auth-title { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 800; color: var(--verde); margin-bottom: 8px; letter-spacing: -0.02em; }
+.auth-subtitle { font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--texto-sec); margin-bottom: 32px; }
+
+/* Campos del formulario */
+.auth-card .campo { text-align: left; margin-bottom: 20px; }
+.auth-card .campo label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--texto); margin-bottom: 8px; }
+.auth-card .campo input {
+    width: 100%;
+    padding: 18px 20px;
+    border: 2px solid var(--borde-suave, #EAEAEA);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    background-color: #FAFAFA;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Borde de contraste al enfocar */
+.auth-card .campo input:focus {
+    outline: none;
+    background-color: var(--blanco);
+    border-color: var(--verde);
+    box-shadow: 0 0 0 4px var(--verde-claro);
+}
+
+/* Error en el input */
+.auth-card .campo input.input-error {
+    border-color: var(--rojo);
+    background-color: var(--rojo-claro);
+}
+.auth-card .campo input.input-error:focus {
+    box-shadow: 0 0 0 4px rgba(168, 50, 50, 0.2);
+}
+
+/* Mensajes de error */
+.error-message {
+    display: none;
+    color: var(--rojo);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 6px;
+    text-align: left;
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+/* Botón Píldora */
+.auth-card .btn-pill {
+    width: 100%;
+    border-radius: 50px;
+    padding: 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 12px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(26, 77, 26, 0.25);
+}
+
+.btn-pill:active { transform: translateY(0); }
+
+.btn-pill.loading {
+    background-color: var(--verde-oscuro);
+    cursor: wait;
+    opacity: 0.8;
+}
+
+/* Alertas limpias (sin bordes laterales) */
+.auth-alert {
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 24px;
+    text-align: center; /* Centrado se ve más natural */
+    animation: slideDown 0.4s ease forwards;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-alert.alert-error {
+    background-color: #FDF2F2; /* Un rojo muy pálido y limpio */
+    color: var(--rojo);
+}
+.auth-alert.alert-success {
+    background-color: #F0FDF4; /* Un verde muy pálido y limpio */
+    color: var(--verde);
+}
+/* Animación para desvanecer la tarjeta al entrar */
+.auth-card.fade-out-card {
+    animation: fadeOutCard 0.6s ease forwards;
+}
+
+@keyframes fadeOutCard {
+    to {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.98);
+        filter: blur(4px);
+    }
+}
+
+/* Conservar la tarjeta accesible en pantallas pequeñas y sin animaciones. */
+@media (max-width: 480px) {
+    .auth-card { padding: 32px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .auth-wrapper *, .auth-wrapper *::before, .auth-wrapper *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+    .auth-card, .auth-card .auth-logo-container, .auth-card .auth-title,
+    .auth-card .auth-subtitle, .auth-card .campo, .auth-card .btn-pill,
+    .auth-card .auth-link { opacity: 1; transform: none; }
+}

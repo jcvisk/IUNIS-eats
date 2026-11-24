@@ -12,6 +12,13 @@ Garantizar que el sistema se ejecute de forma reproducible y pueda demostrarse d
 4. Añadir datos demostrativos y una guía de ejecución limpia.
 5. Realizar una demostración guiada de estudiante y personal.
 
-## Resultado verificable
+---
 
-El proyecto levanta con Docker Compose y supera los escenarios funcionales acordados.
+## 1. Suite de pruebas automatizadas (Issue #24)
+
+Las pruebas unitarias y MVC se ejecutan de manera aislada utilizando base de datos en memoria **H2** (perfil `test` en `src/test/resources/application-test.yml`) y **MockMvc**, sin depender de PostgreSQL local.
+
+### Comando de ejecución
+
+```bash
+./mvnw test

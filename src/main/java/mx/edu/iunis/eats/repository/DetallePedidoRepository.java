@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
     List<DetallePedido> findByIdPedido(Long idPedido);
+
+    boolean existsByIdPlatillo(Long idPlatillo);
 }

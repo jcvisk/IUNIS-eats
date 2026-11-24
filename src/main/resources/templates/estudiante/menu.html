@@ -5,15 +5,14 @@
 
 <th:block th:fragment="content">
 
-    <div class="page-header">
-        <p class="eyebrow">Periodo del día</p>
-        <h1 class="page-title">Menú del día</h1>
-        <p class="page-subtitle">Consulta los platillos disponibles antes del receso.</p>
+    <!-- Encabezado de bienvenida -->
+    <div class="menu-header">
+        <p class="eyebrow" style="color: var(--ambar);">Cafetería Universitaria</p>
+        <h1 class="menu-title">¿Qué se te antoja hoy?</h1>
     </div>
 
     <!-- Tabs de categorías -->
     <div class="tabs-categoria">
-        <!-- Agregamos type="button" para evitar que se comporten como formularios -->
         <button type="button" class="tab active" data-categoria="todos">Todos</button>
         <button type="button" class="tab" data-categoria="comida">Comidas</button>
         <button type="button" class="tab" data-categoria="bebida">Bebidas</button>
@@ -29,31 +28,27 @@
                      th:src="${p.imagen}"
                      th:alt="${p.nombre}">
                 <div th:unless="${p.imagen != null and !p.imagen.isEmpty()}"
-                     class="image-placeholder"></div>
+                     class="image-placeholder">Imagen</div>
             </div>
 
             <div class="card-body">
-                <h3 th:text="${p.nombre}">Nombre del platillo</h3>
-                <p th:text="${p.descripcion}">Descripción del platillo</p>
-
-                <div class="card-footer">
-                    <span class="price"
-                          th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2)}">$0.00</span>
-                    <span class="badge"
-                          th:classappend="${p.disponibilidad} ? 'badge-success' : 'badge-danger'"
-                          th:text="${p.disponibilidad} ? 'Disponible' : 'Agotado'">
-                        Disponible
-                    </span>
+                <div class="card-info">
+                    <h3 th:text="${p.nombre}">Nombre</h3>
+                    <p th:text="${p.descripcion}">Descripción</p>
                 </div>
 
-                <form th:action="@{/carrito/agregar/{id}(id=${p.id})}" method="post" style="margin-top: 12px;">
-                    <button class="btn-primary btn-full"
-                            type="submit"
+                <div class="card-bottom">
+                    <span class="price" th:text="'$' + ${#numbers.formatDecimal(p.precio, 1, 2)}">$0.00</span>
+
+                    <!-- Quitamos el <form> porque el AJAX no lo necesita -->
+                    <button class="btn-add-circle"
+                            type="button"
                             th:disabled="${!p.disponibilidad}"
-                            th:text="${p.disponibilidad} ? 'Agregar al pedido' : 'No disponible'">
-                        Agregar al pedido
+                            th:onclick="|addToCart(${p.id}, this)|"
+                            th:text="${p.disponibilidad} ? '+' : '✕'">
+                        +
                     </button>
-                </form>
+                </div>
             </div>
 
         </article>
@@ -64,6 +59,20 @@
         </div>
     </div>
 
+    <!-- Barra flotante dinámica (AHORA SÍ DENTRO DEL FRAGMENTO) -->
+    <div id="floatingCart" class="carrito-flotante" style="display: none; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div class="carrito-info">
+            <div class="carrito-label">Tu selección</div>
+            <div class="carrito-resumen">
+                <strong id="cartCount">0 ítems</strong>
+                <span>·</span>
+                <strong id="cartTotal">$0.00</strong>
+            </div>
+        </div>
+        <a th:href="@{/carrito}" class="btn-ambar">Ver pedido</a>
+    </div>
+
+    <!-- Scripts -->
     <!-- Sección de combos -->
     <div class="page-header" style="margin-top: 35px;">
         <p class="eyebrow">Promociones</p>
@@ -128,22 +137,20 @@
 
     <!-- Script para los filtros (AHORA SÍ, DENTRO DEL FRAGMENTO) -->
     <script>
+        // --- Lógica de filtros ---
         document.addEventListener("DOMContentLoaded", function() {
             const botones = document.querySelectorAll('.tab');
             const tarjetas = document.querySelectorAll('.card-platillo');
 
             botones.forEach(boton => {
                 boton.addEventListener('click', function() {
-                    // Cambiar clase activa
                     botones.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
 
-                    // Filtrar
                     const categoriaSeleccionada = this.getAttribute('data-categoria');
 
                     tarjetas.forEach(tarjeta => {
                         const categoriaTarjeta = tarjeta.getAttribute('data-categoria');
-
                         if (categoriaSeleccionada === 'todos' || categoriaSeleccionada === categoriaTarjeta) {
                             tarjeta.style.display = 'flex';
                         } else {
@@ -153,6 +160,51 @@
                 });
             });
         });
+
+        // --- Lógica del carrito AJAX ---
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        function addToCart(id, btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '...';
+            btn.disabled = true;
+
+            // Usamos comillas simples normales para evitar conflictos con Thymeleaf
+            fetch('/carrito/agregar-ajax/' + id, {
+                method: 'POST',
+                headers: { [csrfHeader]: csrfToken }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+
+                    btn.style.transform = 'scale(0.8)';
+                    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
+
+                    updateCartUI(data.count, data.total);
+                })
+                .catch(err => {
+                    console.error(err);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+        }
+
+        function updateCartUI(count, total) {
+            const floatingCart = document.getElementById('floatingCart');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+
+            if (count > 0) {
+                cartCount.textContent = count + (count === 1 ? ' ítem' : ' ítems');
+                cartTotal.textContent = '$' + total.toFixed(2);
+
+                floatingCart.style.display = 'flex';
+                setTimeout(() => { floatingCart.style.transform = 'translateY(0)'; }, 10);
+            }
+        }
     </script>
 
 </th:block>

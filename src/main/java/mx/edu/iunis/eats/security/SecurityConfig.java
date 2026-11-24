@@ -23,8 +23,9 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/images/**", "/manifest.json", "/sw.js", "/register", "/login").permitAll()
 
                         // Usamos hasAuthority para que coincida con tu base de datos
-                        .requestMatchers("/admin/**").hasRole("CAFETERIA_STAFF")
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_CAFETERIA_STAFF")
                         .requestMatchers("/users/**", "/user/**").hasRole("CAFETERIA_STAFF")
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

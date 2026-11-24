@@ -6,32 +6,36 @@
     <title>Acceso al sistema | IUNIS Eats</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
 
+<!-- Formas animadas de fondo -->
+<div class="bg-shape shape-1"></div>
+<div class="bg-shape shape-2"></div>
+<div class="bg-shape shape-3"></div>
+
 <div class="auth-wrapper">
     <main class="auth-card">
 
-        <img th:src="@{/images/logo-iunis-eats.png}"
-             alt="IUNIS Eats"
-             class="auth-logo">
+        <div class="auth-logo-container">
+            <img th:src="@{/images/logo-iunis-eats.png}" alt="IUNIS Eats" class="auth-logo">
+        </div>
 
-        <h1>Acceso al sistema</h1>
+        <h1 class="auth-title">Acceso al sistema</h1>
         <p class="auth-subtitle">Ingresa con tu cuenta institucional.</p>
 
-        <p class="alert" th:if="${param.error}" role="alert">
+        <!-- Alerta de error del servidor (Contraseña incorrecta) -->
+        <div id="serverError" class="auth-alert alert-error" th:if="${param.error}" style="display: none;">
             Usuario o contraseña incorrectos.
-        </p>
-
-        <p class="notice" th:if="${param.logout}">
+        </div>
+        <div th:if="${param.logout}" class="auth-alert alert-success">
             Sesión cerrada correctamente.
-        </p>
+        </div>
 
-        <p class="notice" th:if="${notice}" th:text="${notice}"></p>
-
-        <form th:action="@{/login}" method="post">
+        <!-- Formulario -->
+        <form id="loginForm" th:action="@{/login}" method="post" novalidate>
 
             <div class="campo">
                 <label for="username">Número de control</label>
@@ -40,7 +44,8 @@
                        type="text"
                        autocomplete="username"
                        placeholder="Ej. 20230145"
-                       required>
+                       th:value="${param.username}"> <!-- Mantiene el usuario si el servidor lo rebota -->
+                <span class="error-message" id="usernameError">El número de control es obligatorio.</span>
             </div>
 
             <div class="campo">
@@ -49,14 +54,13 @@
                        name="password"
                        type="password"
                        autocomplete="current-password"
-                       placeholder="••••••••"
-                       required>
+                       placeholder="••••••••">
+                <span class="error-message" id="passwordError">La contraseña es obligatoria.</span>
             </div>
 
-            <button class="btn-primary" type="submit">
+            <button id="submitBtn" class="btn-primary btn-pill" type="submit">
                 Entrar
             </button>
-
         </form>
 
         <p class="auth-link">
@@ -65,11 +69,80 @@
         </p>
 
         <p class="auth-footer">
-            Instituto Universitario del Sureste · Cafetería
+            Instituto Universitario del Sureste · IUNIS Eats
         </p>
 
     </main>
 </div>
+
+<!-- Lógica de Validación en Tiempo Real -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('loginForm');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const userError = document.getElementById('usernameError');
+        const passError = document.getElementById('passwordError');
+        const serverError = document.getElementById('serverError');
+
+        // 1. RECUPERAR DATOS: Si el servidor rechazó el login, recuperamos lo que había escrito
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            serverError.style.display = 'block';
+            username.value = sessionStorage.getItem('temp_user') || '';
+            password.value = sessionStorage.getItem('temp_pass') || '';
+        }
+
+        // 2. VALIDACIÓN EN TIEMPO REAL
+        function validateInput(input, errorElement) {
+            if (input.value.trim() === '') {
+                input.classList.add('input-error'); // Borde rojo
+                errorElement.style.display = 'block'; // Muestra mensaje
+                return false;
+            } else {
+                input.classList.remove('input-error');
+                errorElement.style.display = 'none';
+                return true;
+            }
+        }
+
+        // Escuchar cada tecla que se presiona
+        username.addEventListener('input', () => validateInput(username, userError));
+        password.addEventListener('input', () => validateInput(password, passError));
+
+        // 3. AL ENVIAR EL FORMULARIO
+        // 3. AL ENVIAR EL FORMULARIO (Con transición de salida)
+        form.addEventListener('submit', function(e) {
+            const isUserValid = validateInput(username, userError);
+            const isPassValid = validateInput(password, passError);
+
+            if (!isUserValid || !isPassValid) {
+                e.preventDefault(); // Evita que se envíe y la página se recargue
+            } else {
+                // Guardamos temporalmente las credenciales
+                sessionStorage.setItem('temp_user', username.value);
+                sessionStorage.setItem('temp_pass', password.value);
+
+                e.preventDefault(); // Detenemos el envío para hacer la animación
+
+                // Animación de carga en el botón
+                submitBtn.innerHTML = 'Iniciando sesión...';
+                submitBtn.classList.add('loading');
+
+                // Animación de desvanecimiento de la tarjeta
+                const card = document.querySelector('.auth-card');
+                card.classList.add('fade-out-card');
+
+                // Esperamos 600ms (lo que dura la animación) y enviamos el formulario
+                setTimeout(() => {
+                    form.submit();
+                }, 600);
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

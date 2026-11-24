@@ -1,9 +1,6 @@
 package mx.edu.iunis.eats.controller;
 
-import mx.edu.iunis.eats.domain.CarritoItem;
-import mx.edu.iunis.eats.domain.DetallePedido;
-import mx.edu.iunis.eats.domain.Pedido;
-import mx.edu.iunis.eats.domain.Platillo;
+import mx.edu.iunis.eats.domain.*;
 import mx.edu.iunis.eats.repository.DetallePedidoRepository;
 import mx.edu.iunis.eats.repository.PedidoRepository;
 import mx.edu.iunis.eats.repository.UserRepository;

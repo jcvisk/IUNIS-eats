@@ -1,7 +1,7 @@
 package mx.edu.iunis.eats.service;
 
 import mx.edu.iunis.eats.domain.User;
-import mx.edu.iunis.eats.repository.PersonalDataRepository;
+import mx.edu.iunis.eats.repository.DatosPersonalesRepository;
 import mx.edu.iunis.eats.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +14,11 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
-    private final PersonalDataRepository personalDataRepository;
+    private final DatosPersonalesRepository personalDataRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
-                           PersonalDataRepository personalDataRepository,
+                           DatosPersonalesRepository personalDataRepository,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.personalDataRepository = personalDataRepository;

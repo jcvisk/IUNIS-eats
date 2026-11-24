@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página no encontrada | IUNIS Eats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: #F7F6F3; color: #2B2B2B;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+        }
+        .error-container {
+            text-align: center; padding: 40px 20px; max-width: 400px; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .error-logo-img { height: 70px; width: auto; margin-bottom: 40px; }
+        .error-img { width: 180px; height: auto; margin-bottom: 24px; }
+        .error-code { font-family: 'Outfit', sans-serif; font-size: 5rem; font-weight: 900; color: #1A4D1A; margin: 0; line-height: 1; }
+        .error-title { font-size: 1.25rem; font-weight: 600; margin: 16px 0 8px 0; color: #1A4D1A; }
+        .error-text { font-size: 0.95rem; color: #6B6B6B; margin-bottom: 32px; line-height: 1.5; }
+        .btn-error { display: inline-block; background-color: #1A4D1A; color: #FFFFFF; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: background-color 0.2s; }
+        .btn-error:hover { background-color: #0F3310; }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <img th:src="@{/images/logo-iunis-eats.png}" alt="IUNIS Eats" class="error-logo-img">
+
+    <!-- Asegúrate de que tu imagen se llame así, o cámbialo -->
+    <img th:src="@{/images/error-planta.png}" alt="Error 404" class="error-img">
+
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Página no encontrada</h2>
+    <p class="error-text">Parece que el platillo que buscas no está en el menú de hoy, o el enlace se ha roto.</p>
+
+    <a th:href="@{/menu}" class="btn-error">Volver al menú</a>
+</div>
+</body>
+</html>

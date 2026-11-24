@@ -11,11 +11,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import mx.edu.iunis.eats.service.ComboService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/carrito")
@@ -23,12 +26,18 @@ public class CarritoController {
 
     @Autowired
     private PlatilloService platilloService;
+
+    @Autowired
+    private ComboService comboService;
+
     @Autowired
     private PedidoRepository pedidoRepository;
+
     @Autowired
     private DetallePedidoRepository detallePedidoRepository;
+
     @Autowired
-    private UserRepository userRepository; // Inyectamos el repositorio de usuarios
+    private UserRepository userRepository;
 
     @SuppressWarnings("unchecked")
     private List<CarritoItem> getCarrito(HttpSession session) {
@@ -38,6 +47,30 @@ public class CarritoController {
             session.setAttribute("carrito", carrito);
         }
         return carrito;
+    }
+
+    private boolean componentesDisponibles(Long idCombo) {
+
+        List<ComboPlatillo> componentes =
+                comboService.obtenerComponentes(idCombo);
+
+        if (componentes == null || componentes.isEmpty()) {
+            return false;
+        }
+
+        for (ComboPlatillo componente : componentes) {
+
+            Platillo platillo = platilloService
+                    .obtenerPorId(componente.getIdPlatillo())
+                    .orElse(null);
+
+            if (platillo == null ||
+                    !Boolean.TRUE.equals(platillo.getDisponibilidad())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @GetMapping
@@ -57,7 +90,7 @@ public class CarritoController {
             List<CarritoItem> carrito = getCarrito(session);
             boolean existe = false;
             for (CarritoItem item : carrito) {
-                if (item.getIdPlatillo().equals(id)) {
+                if (id.equals(item.getIdPlatillo())) {
                     item.setCantidad(item.getCantidad() + 1);
                     existe = true;
                     break;
@@ -70,25 +103,148 @@ public class CarritoController {
         return "redirect:/menu";
     }
 
-    @PostMapping("/confirmar")
-    public String confirmar(HttpSession session, Authentication authentication) {
+    @PostMapping("/agregar-combo/{id}")
+    public String agregarCombo(@PathVariable Long id, HttpSession session) {
+
+        Combo combo = comboService.obtenerPorId(id).orElse(null);
+
+        if (combo != null
+                && Boolean.TRUE.equals(combo.getDisponibilidad())
+                && componentesDisponibles(id)) {
+
+            List<CarritoItem> carrito = getCarrito(session);
+            boolean existe = false;
+
+            for (CarritoItem item : carrito) {
+                if (id.equals(item.getIdCombo())) {
+                    item.setCantidad(item.getCantidad() + 1);
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                carrito.add(new CarritoItem(
+                        combo.getNombre(),
+                        combo.getPrecio(),
+                        1,
+                        combo.getId()
+                ));
+            }
+        }
+
+        return "redirect:/menu";
+    }
+
+    // --- NUEVO MÉTODO PARA TIEMPO REAL (AJAX) ---
+    @PostMapping("/agregar-ajax/{id}")
+    @ResponseBody
+    public Map<String, Object> agregarAjax(@PathVariable Long id, HttpSession session) {
+        Platillo platillo = platilloService.obtenerPorId(id).orElse(null);
+        if (platillo != null) {
+            List<CarritoItem> carrito = getCarrito(session);
+            boolean existe = false;
+            for (CarritoItem item : carrito) {
+                if (item.getIdPlatillo().equals(id)) {
+                    item.setCantidad(item.getCantidad() + 1);
+                    existe = true;
+                    break;
+                }
+            }
+            if (!existe) {
+                carrito.add(new CarritoItem(platillo.getId(), platillo.getNombre(), new BigDecimal(platillo.getPrecio().toString()), 1));
+            }
+        }
+
+        List<CarritoItem> carritoFinal = getCarrito(session);
+        BigDecimal total = carritoFinal.stream().map(CarritoItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        int count = carritoFinal.stream().mapToInt(CarritoItem::getCantidad).sum();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("count", count);
+        response.put("total", total.doubleValue());
+        return response;
+    }
+    @PostMapping("/restar/{id}")
+    public String restar(@PathVariable Long id, HttpSession session) {
         List<CarritoItem> carrito = getCarrito(session);
 
-        if (!carrito.isEmpty()) {
-            // --- SOLUCIÓN AL ISSUE #15 ---
-            // 1. Buscamos al usuario real por su username en la BD
-            String username = authentication.getName();
-            User usuario = userRepository.findByUserName(username).orElse(null);
+        // Usamos un iterador para poder eliminar el elemento sin errores
+        java.util.Iterator<CarritoItem> iterator = carrito.iterator();
+        while (iterator.hasNext()) {
+            CarritoItem item = iterator.next();
+            if (item.getIdPlatillo().equals(id)) {
+                item.setCantidad(item.getCantidad() - 1);
 
-            // Si el usuario no existe por alguna razón, lo rechazamos (controlado)
-            if (usuario == null) {
-                return "redirect:/login?error=usuarioNoEncontrado";
+                // Si la cantidad llega a 0, lo quitamos del carrito
+                if (item.getCantidad() <= 0) {
+                    iterator.remove();
+                }
+                break;
             }
+        }
+
+        return "redirect:/carrito"; // Recarga la página para ver los cambios
+    }
+    // ---------------------------------------------
+
+    @PostMapping("/confirmar")
+    public String confirmar(
+            HttpSession session,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        List<CarritoItem> carrito = getCarrito(session);
+        // Verificar nuevamente la disponibilidad antes de crear el pedido.
+        for (CarritoItem item : carrito) {
+
+            if (item.getIdCombo() != null) {
+
+                Combo combo = comboService
+                        .obtenerPorId(item.getIdCombo())
+                        .orElse(null);
+
+                if (combo == null
+                        || !Boolean.TRUE.equals(combo.getDisponibilidad())
+                        || !componentesDisponibles(item.getIdCombo())) {
+
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            "El combo \"" + item.getNombre()
+                                    + "\" o alguno de sus platillos ya no está disponible."
+                    );
+
+                    return "redirect:/carrito";
+                }
+
+            } else if (item.getIdPlatillo() != null) {
+
+                Platillo platillo = platilloService
+                        .obtenerPorId(item.getIdPlatillo())
+                        .orElse(null);
+
+                if (platillo == null
+                        || !Boolean.TRUE.equals(platillo.getDisponibilidad())) {
+
+                    redirectAttributes.addFlashAttribute(
+                            "error",
+                            "El platillo \"" + item.getNombre()
+                                    + "\" ya no está disponible."
+                    );
+
+                    return "redirect:/carrito";
+                }
+            }
+        }
+
+        if (!carrito.isEmpty()) {
+            String username = authentication.getName();
+            mx.edu.iunis.eats.domain.User usuario = userRepository.findByUserName(username).orElse(null);
+            if (usuario == null) return "redirect:/login?error=usuarioNoEncontrado";
 
             BigDecimal total = carrito.stream().map(CarritoItem::getSubtotal).reduce(BigDecimal.ZERO, BigDecimal::add);
 
             Pedido pedido = new Pedido();
-            pedido.setIdUsuario(usuario.getId()); // Guardamos el ID REAL (Primary Key)
+            pedido.setIdUsuario(usuario.getId());
             pedido.setFechaHora(LocalDateTime.now());
             pedido.setTotal(total);
             pedido.setEstado("PENDIENTE");
@@ -97,10 +253,20 @@ public class CarritoController {
 
             for (CarritoItem item : carrito) {
                 DetallePedido detalle = new DetallePedido();
+
                 detalle.setIdPedido(pedido.getId());
-                detalle.setIdPlatillo(item.getIdPlatillo());
+
+                if (item.getIdCombo() != null) {
+                    detalle.setIdCombo(item.getIdCombo());
+                    detalle.setIdPlatillo(null);
+                } else {
+                    detalle.setIdPlatillo(item.getIdPlatillo());
+                    detalle.setIdCombo(null);
+                }
+
                 detalle.setCantidad(item.getCantidad());
                 detalle.setPrecioAplicado(item.getPrecio());
+
                 detallePedidoRepository.save(detalle);
             }
             carrito.clear();

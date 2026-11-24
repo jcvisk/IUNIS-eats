@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base-admin :: layout(~{::content})}">
+<body>
+
+<th:block th:fragment="content">
+
+    <!-- Encabezado -->
+    <div class="page-header-admin">
+        <h1 class="page-title-admin">Catálogo de combos</h1>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/admin/combos/nuevo}" class="btn-primary">
+            + Nuevo combo
+        </a>
+    </div>
+
+    <!-- Tabla de combos -->
+    <div class="tabla-container">
+        <table class="tabla-admin">
+            <thead>
+            <tr>
+                <th>IMG</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Disponibilidad</th>
+                <th>Acciones</th>
+
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- Mostrar los combos registrados -->
+            <tr th:each="c : ${combos}">
+
+                <td class="celda-img">
+                    <div class="img-thumb"
+                         th:style="${c.imagen != null and !c.imagen.isEmpty()} ? 'background-image: url(' + ${c.imagen} + ')' : ''">
+                    </div>
+                </td>
+
+                <td th:text="${c.nombre}">Nombre</td>
+
+                <td th:text="${c.descripcion}">Descripción</td>
+
+                <td class="celda-precio"
+                    th:text="'$' + ${#numbers.formatDecimal(c.precio, 1, 2)}">
+                    $0.00
+                </td>
+
+                <td th:text="${c.disponibilidad} ? 'Disponible' : 'Agotado'">
+                    Disponible
+                </td>
+
+                <td>
+                    <a th:href="@{/admin/combos/editar/{id}(id=${c.id})}"
+                       class="btn-primary">
+                        Editar
+                    </a>
+                </td>
+
+            </tr>
+
+            <!-- Mensaje cuando no hay combos -->
+            <tr th:if="${combos == null or combos.isEmpty()}">
+                <td colspan="6" class="tabla-vacia">
+                    No hay combos registrados todavía.
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</th:block>
+
+</body>
+</html>

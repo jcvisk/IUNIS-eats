@@ -10,6 +10,11 @@
         <h1 class="page-title">Tu pedido</h1>
     </div>
 
+    <div th:if="${error != null}"
+         class="mensaje-error"
+         th:text="${error}">
+    </div>
+
     <div class="card-platillo" style="padding: 24px; max-width: 800px; margin: 0 auto;">
 
         <div th:if="${carrito != null and !carrito.isEmpty()}">
@@ -20,9 +25,17 @@
                     <p style="color: var(--texto-sec); font-size: 0.875rem; margin: 4px 0;"
                        th:text="'$' + ${#numbers.formatDecimal(item.precio, 1, 2)} + ' c/u'">$0.00 c/u</p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <span style="font-weight: 600;" th:text="'x' + ${item.cantidad}">x1</span>
-                    <strong style="color: var(--ambar);" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</strong>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <!-- Botón de Restar -->
+                    <form th:action="@{/carrito/restar/{id}(id=${item.idPlatillo})}" method="post" style="margin: 0;">
+                        <button type="submit" class="btn-restar" title="Quitar uno">−</button>
+                    </form>
+
+                    <!-- Cantidad -->
+                    <span style="font-weight: 600; font-size: 1.1rem; min-width: 20px; text-align: center;" th:text="${item.cantidad}">1</span>
+
+                    <!-- Subtotal -->
+                    <strong style="color: var(--ambar); min-width: 60px; text-align: right;" th:text="'$' + ${#numbers.formatDecimal(item.subtotal, 1, 2)}">$0.00</strong>
                 </div>
             </div>
 
